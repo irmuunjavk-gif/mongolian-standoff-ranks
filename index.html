@@ -1195,6 +1195,9 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
 .msr-comment-box .comment small{display:block;color:var(--dim);margin-bottom:4px}
 .msr-comment-box .note{font-size:12px;color:var(--dim);margin:6px 0}
 </style>
+<style id="msr-introduction-style">
+.msr-intro{max-width:1120px;margin:0 auto;padding:10px 0 50px;color:#eaf1fb}.msr-intro-hero{padding:clamp(28px,6vw,70px) clamp(20px,5vw,58px);border:1px solid #355474;border-radius:22px;background:radial-gradient(ellipse at 85% 15%,rgba(45,121,154,.24),transparent 55%),linear-gradient(135deg,#17283d,#101a2b 75%);box-shadow:0 16px 50px #0003}.msr-intro-eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#7dbdff}.msr-intro h1{font-size:clamp(32px,7vw,60px);line-height:1.12;margin:15px 0 20px;letter-spacing:-1.4px}.msr-intro-lead{font-size:clamp(16px,2.3vw,20px);line-height:1.7;max-width:690px;color:#c5d3e5}.msr-intro-buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.msr-intro-primary,.msr-intro-secondary{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:10px;padding:13px 19px;font-weight:800;font-size:14px}.msr-intro-primary{background:#4d99ef;color:#081526}.msr-intro-secondary{border:1px solid #527294;color:#d7e8ff}.msr-intro-section{margin:36px 0;padding:20px 5px}.msr-intro-section h2{font-size:clamp(22px,4vw,31px);margin:12px 0}.msr-intro-section p{color:#b9c9dd;line-height:1.8;max-width:800px}.msr-intro-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.msr-intro-tile{display:block;text-decoration:none;border:1px solid #34485e;background:linear-gradient(145deg,#1b293a,#111b2a);padding:25px;border-radius:16px;transition:border-color .2s,transform .2s}.msr-intro-tile:hover{border-color:#75b6f5;transform:translateY(-2px)}.msr-intro-tile h3{color:#f2f6ff;font-size:20px;margin:0 0 12px}.msr-intro-tile p{color:#b9c8da;font-size:14px;line-height:1.65}.msr-intro-tile span{color:#85baff;font-size:13px;font-weight:800}.msr-intro-bottom{border-top:1px solid #35475d}@media(max-width:620px){.msr-intro-grid{grid-template-columns:1fr}.msr-intro-tile{padding:20px}.msr-intro-hero{border-radius:16px}.msr-intro{padding-bottom:90px}}
+</style>
 </head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
@@ -1381,10 +1384,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     //   maps: [['Province', null, null, 'soon', 'Decider']] },
   ];
 
-  var NEWS = [
-    { id: 7, g: 'Earlier', t: '3 өдрийн өмнө', c: 12, h: 'Province газрын зургийн шинэ стратеги: товч тойм',
-      lead: 'Тэргүүлэх багууд B цэгийг хэрхэн хамгаалж байна.', body: ['Энэ улирлын Province-ийн тоглолтуудын 60 гаруй хувьд хамгаалж буй тал B цэг дээр гурван тоглогчоо төвлөрүүлсэн.'] }
-  ];
+  var NEWS = [];
 
   var EVENTS = [
     { id: 'msl', n: 'MSL Major S2', st: 'soon', dt: 'Coming soon', loc: 'Ulaanbaatar', teams: 'TBA', prize: 'TBA', img: 'data:image/jpeg;base64,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' },
@@ -1641,35 +1641,38 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     });
   })();
   V.news = function () {
-    var f = NEWS[0], rest = NEWS.slice(1);
-    var feature = h('a', { class: 'feature', href: '#article/' + f.id },
-      h('i', { class: 'cap', 'aria-hidden': 'true' }),
-      h('div', { class: 'art', 'aria-hidden': 'true' }, f.a ? [crest(f.a, 'lg'), h('span', { class: 'x' }, 'VS'), crest(f.b, 'lg')] : h('div', { class: 'top3' }, h('span', { class: 't3h' }, 'Top 3 teams'), h('div', { class: 't3r' }, RANK.slice(0, 3).map(function (r, i) {
-        return h('span', { class: 't3', title: T[r[0]].n }, crest(r[0], 'xl'), h('span', { class: 't3n' }, '#' + (i + 1)));
-      })))),
-      h('div', { class: 'txt' },
-        h('div', { class: 'kick' }, f.live ? [h('span', { class: 'tag live' }, h('span', { class: 'pip' }), 'Live'), ' ', h('span', { class: 'tag soft' }, 'MSL Major S2')] : h('span', { class: 'tag soft' }, 'Latest')),
-        h('h2', null, f.h), h('p', null, f.lead)));
-    var side = h('div', { class: 'side-stack' }, rest.slice(0, 3).map(function (n) {
-      return h('a', { class: 'ncard', href: '#article/' + n.id }, h('div', { class: 'meta' }, h('span', null, n.t), comments(n.c)), h('h3', null, n.h));
-    }));
-    var groups = [];
-    ['Today', 'Yesterday', 'Earlier'].forEach(function (g) {
-      var items = NEWS.filter(function (n) { return n.g === g; });
-      if (!items.length) return;
-      groups.push(h('div', { class: 'grp-h' }, ({ Today: 'Өнөөдөр', Yesterday: 'Өчигдөр', Earlier: 'Өмнөх' })[g] || g));
-      groups.push(h('div', { class: 'box' }, items.map(function (n) {
-        return h('a', { class: 'nrow', href: '#article/' + n.id }, flag(), h('span', { class: 'hd' }, n.h), h('span', { class: 'tm' }, n.t), comments(n.c));
-      })));
-    });
-    var msl = h('a', { class: 'mslb', href: '#event/msl', style: '--mslimg:url(' + MSLIMG + ')', 'aria-label': 'MSL Major S2' },
-      h('div', null, h('span', { class: 'tag soft' }, 'Event'), h('h2', null, 'MSL Major S2'), h('p', null, 'New tournament — see the Swiss bracket and details.'), h('span', { class: 'go' }, 'View bracket →')));
-    var tbox = h('div', { class: 'box' }, RANK.slice(0, 10).map(function (r, i) {
-      return h('a', { class: 'srow tt', href: teamHref(r[0]) }, h('span', { class: 'pos' }, i + 1), crest(r[0]), h('b', null, T[r[0]].n), h('span', { class: 'k' }, fmt(r[1]) + ' pts'));
-    }), h('a', { class: 'more', href: '#ranking' }, 'Full ranking →'));
-    var aside = h('aside', null, h('div', { class: 'grp-h' }, 'Top teams'), tbox);
-    return h('div', null, pageHead('Мэдээ', 'Монголын Standoff 2-ын тэмцээн, баг, тоглогчдын мэдээ.'), goldBanner(), msl,
-      h('div', { class: 'hl-home' }, h('div', null, h('div', { class: 'news-grid' }, feature, side), h('div', { style: 'margin-top:18px' }, groups)), aside));
+    var tiles = [
+      ['#ranking', 'Team Rankings', 'Explore competitive team standings and ELO ratings across the Mongolian Standoff 2 scene.', 'View rankings →'],
+      ['#players', 'Player Rankings', 'Discover player performance, ratings and competitive statistics.', 'Explore players →'],
+      ['#matches', 'Matches & Results', 'Follow tournament matchups, completed results and team performance.', 'View matches →'],
+      ['#events', 'Tournaments & Events', 'Find information about upcoming and ongoing community competitions.', 'Explore events →']
+    ];
+    return h('div', { class: 'msr-intro' },
+      h('section', { class: 'msr-intro-hero' },
+        h('span', { class: 'msr-intro-eyebrow' }, 'WELCOME TO MSR'),
+        h('h1', null, 'Mongolian Standoff Ranks'),
+        h('p', { class: 'msr-intro-lead' }, 'A community platform dedicated to Mongolia’s Standoff 2 esports scene. Discover teams, players, rankings, matches and tournaments — all in one place.'),
+        h('div', { class: 'msr-intro-buttons' },
+          h('a', { href: '#ranking', class: 'msr-intro-primary' }, 'Explore Rankings →'),
+          h('a', { href: '#players', class: 'msr-intro-secondary' }, 'Player Rankings')
+        )
+      ),
+      h('section', { class: 'msr-intro-section' },
+        h('span', { class: 'msr-intro-eyebrow' }, 'WHAT IS MSR?'),
+        h('h2', null, 'Built for the Mongolian Standoff 2 community'),
+        h('p', null, 'MSR (Mongolian Standoff Ranks) brings competitive information together to make it easier for fans, teams and players to explore the local esports scene. Our goal is to make rankings and tournament information easier to find and follow.')
+      ),
+      h('section', { class: 'msr-intro-grid' }, tiles.map(function(t){
+        return h('a', { class: 'msr-intro-tile', href: t[0] },
+          h('h3', null, t[1]), h('p', null, t[2]), h('span', null, t[3]));
+      })),
+      h('section', { class: 'msr-intro-section msr-intro-bottom' },
+        h('span', { class: 'msr-intro-eyebrow' }, 'GROWING TOGETHER'),
+        h('h2', null, 'The next chapter of Mongolian Standoff esports'),
+        h('p', null, 'MSR is an evolving community project. Features and data will continue to improve as tournaments and teams are added.'),
+        h('a', { href: '#events', class: 'msr-intro-primary' }, 'See Tournaments →')
+      )
+    );
   };
 
   // Per-article local interactions. Comments/likes are stored on this device,
