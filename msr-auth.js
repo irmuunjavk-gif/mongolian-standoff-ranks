@@ -66,7 +66,7 @@
     d.addEventListener('click', function (e) { if (e.target === d) closeModal(); });
     var title = { login: 'Нэвтрэх', register: 'Бүртгүүлэх', forgot: 'Нууц үг сэргээх', reset: 'Шинэ нууц үг' }[mode];
     var msg = el('p', { class: 'msr-msg', role: 'alert' });
-    function say(t, bad) { msg.textContent = t; msg.className = 'msr-msg ' + (bad ? 'bad' : 'ok'); }
+    function say(t, bad) { msg.textContent = t; msg.className = 'msr-msg msr-no-translate ' + (bad ? 'bad' : 'ok'); }
     var email = el('input', { type: 'email', required: true, autocomplete: 'email', placeholder: 'Имэйл' });
     var pass = el('input', { type: 'password', required: true, minlength: 8, autocomplete: mode === 'login' ? 'current-password' : 'new-password', placeholder: mode === 'reset' ? 'Шинэ нууц үг (8+ тэмдэгт)' : 'Нууц үг (8+ тэмдэгт)' });
     var pass2 = el('input', { type: 'password', required: true, minlength: 8, autocomplete: 'new-password', placeholder: 'Нууц үгээ давтах' });
@@ -124,7 +124,7 @@
         save.disabled = true; say('');
         try {
           var patch = {}, nv = name.value.trim();
-          if (nv !== p.username) { if (!UNAME.test(nv)) return say('Username 3–20 тэмдэгт, зөвхөн латин үсэг, тоо, _ байна.', true); var a = await sb.rpc('username_available', { name: nv }); if (a.error) throw a.error; if (!a.data && nv.toLowerCase() !== p.username.toLowerCase()) return say('Энэ username авагдсан байна.', true); patch.username = nv; }
+          if (nv !== p.username) { if (!UNAME.test(nv)) return say('Username must be 3–20 characters: English letters, numbers or underscore (_). Hyphens (-) are not allowed. Use MSR_VERIFY_2026 instead.', true); var a = await sb.rpc('username_available', { name: nv }); if (a.error) throw a.error; if (!a.data && nv.toLowerCase() !== p.username.toLowerCase()) return say('Энэ username авагдсан байна.', true); patch.username = nv; }
           var f = file.files[0];
           if (f) {
             if (!TYPES[f.type]) return say('Зөвхөн JPG, PNG, WebP зураг оруулна.', true);
@@ -132,7 +132,7 @@
             var path = S.user.id + '/avatar-' + Date.now() + '.' + TYPES[f.type], up = await sb.storage.from('avatars').upload(path, f, { contentType: f.type, upsert: false }); if (up.error) throw up.error;
             patch.avatar_url = sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
           }
-          if (!Object.keys(patch).length) return say('Өөрчлөлт алга.');
+          if (!Object.keys(patch).length) return say('No changes to save.');
           var r = await sb.from('profiles').update(patch).eq('id', S.user.id).select('id').single(); if (r.error) throw r.error;
           await loadUser((await sb.auth.getSession()).data.session); toast('Профайл хадгалагдлаа.');
         } catch (x) { say(err(x), true); } finally { save.disabled = false; }
