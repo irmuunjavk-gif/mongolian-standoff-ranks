@@ -1055,6 +1055,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
     <a class="brand" href="#news" aria-label="MSR — home">
       <span class="nm">MSR</span>
     </a>
+    <div id="msr-auth" class="msr-auth"></div>
     <nav class="main" aria-label="Main menu">
       <a href="#news" data-r="news">News</a>
       <a href="#matches" data-r="matches">Matches</a>
@@ -2642,9 +2643,25 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   }
   V.events = eventsApp;
 
+  // Keep authentication views inside the existing router.
+  V.profile = function () {
+    return window.MSR ? window.MSR.profileView() : h('div', null, 'Ачаалж байна…');
+  };
+  var articleView = V.article;
+  V.article = function (id) {
+    var node = articleView(id);
+    if (window.MSR && NEWS.some(function (n) { return String(n.id) === String(id); })) {
+      node.appendChild(window.MSR.comments(id));
+    }
+    return node;
+  };
+  document.addEventListener('msr:ready', function () {
+    if (/^(profile|article)(\/|$)/.test(H)) route();
+  });
+
   /* ================= router ================= */
   var app = document.getElementById('app'), q = document.getElementById('q');
-  var TITLES = { match: 'Match', event: 'Events', gold: 'Gold', team: 'Team', player: 'Player', news: 'News', article: 'News', matches: 'Matches', results: 'Results', events: 'Events', ranking: 'Ranking', players: 'Players', stats: 'Stats', live: 'Live', major: 'Major', search: 'Search' };
+  var TITLES = { profile: 'Profile', match: 'Match', event: 'Events', gold: 'Gold', team: 'Team', player: 'Player', news: 'News', article: 'News', matches: 'Matches', results: 'Results', events: 'Events', ranking: 'Ranking', players: 'Players', stats: 'Stats', live: 'Live', major: 'Major', search: 'Search' };
   function goBack() { var i = history.state && history.state.i || 0; if (i > 0) history.back(); else navTo('news'); }
   function paint(name, node) {
     if (name !== 'news' && !node.querySelector('.back')) {
