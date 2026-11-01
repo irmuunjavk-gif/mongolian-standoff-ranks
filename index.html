@@ -3449,6 +3449,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     hero.appendChild(wrap);
   }
   var profileTimer;new MutationObserver(function(){if(!document.getElementById('msr-profile-hero'))return;clearTimeout(profileTimer);profileTimer=setTimeout(paintProfile,250)}).observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('msr:cosmetic-change',function(){paintProfile()});
   async function user(){var x=await client.auth.getUser();return x.data&&x.data.user}
   async function refresh(){
     var shop=document.querySelector('.msr-shop');if(!shop)return;
