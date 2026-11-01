@@ -167,7 +167,7 @@
       var cover=el('div',{class:'msr-discord-cover'},el('span',null,'MSR · PLAYER PROFILE'));
       box.appendChild(cover);
       box.appendChild(hero);
-      var editProfile=el('button',{class:'msr-btn pri msr-profile-edit-btn',type:'button',onclick:function(){showTab('settings');}},'✎ Edit Profile');
+      var editProfile=el('button',{class:'msr-btn pri msr-profile-edit-btn',type:'button',onclick:function(){showTab('edit');}},'✎ Edit Profile');
       box.appendChild(editProfile);
       var tabs=el('nav',{class:'msr-profile-tabs','aria-label':'Profile sections'});
       var panels=el('div',{class:'msr-profile-panels'});
@@ -175,11 +175,12 @@
       var activityPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-activity',hidden:true});
       var inventoryPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-inventory',hidden:true});
       var settingsPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-settings',hidden:true});
+      var editPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-edit',hidden:true});
       var tabsData=[['main','Main'],['activity','Activity'],['inventory','Inventory'],['settings','Settings']];
-      function showTab(id){tabsData.forEach(function(t){var pane=panels.querySelector('#msr-tab-'+t[0]);if(pane)pane.hidden=t[0]!==id;var btn=tabs.querySelector('[data-tab="'+t[0]+'"]');if(btn){btn.classList.toggle('active',t[0]===id);btn.setAttribute('aria-selected',String(t[0]===id));}});var account=panels.querySelector('#msr-profile-settings');if(account)account.hidden=id!=='settings';}
+      function showTab(id){tabsData.forEach(function(t){var pane=panels.querySelector('#msr-tab-'+t[0]);if(pane)pane.hidden=t[0]!==id;var btn=tabs.querySelector('[data-tab="'+t[0]+'"]');if(btn){btn.classList.toggle('active',t[0]===id);btn.setAttribute('aria-selected',String(t[0]===id));}});var account=panels.querySelector('#msr-profile-settings');if(account)account.hidden=id!=='settings';var editor=panels.querySelector('#msr-tab-edit');if(editor)editor.hidden=id!=='edit';}
       tabsData.forEach(function(t){tabs.appendChild(el('button',{type:'button','data-tab':t[0],class:t[0]==='main'?'active':'',onclick:function(){showTab(t[0]);}},t[1]));});
       box.appendChild(tabs);
-      panels.appendChild(mainPanel);panels.appendChild(activityPanel);panels.appendChild(inventoryPanel);panels.appendChild(settingsPanel);box.appendChild(panels);
+      panels.appendChild(mainPanel);panels.appendChild(activityPanel);panels.appendChild(inventoryPanel);panels.appendChild(settingsPanel);panels.appendChild(editPanel);box.appendChild(panels);
       mainPanel.appendChild(el('div',{class:'msr-profile-promo'},[
         el('h3',null,'Customize your MSR profile'),
         el('p',null,'Unlock profile frames, banners and effects in the Shop.'),
@@ -204,7 +205,46 @@
         el('h3',{class:'msr-profile-title'},'⚙ Account Settings'),
         el('dl',null,[el('dt',null,'Имэйл'),el('dd',null,S.user.email),el('dt',null,'Бүртгүүлсэн'),el('dd',null,new Date(S.user.created_at).toLocaleDateString('mn-MN')),el('dt',null,'Username'),el('dd',null,name),el('dt',null,'Профайл зураг'),el('dd',null,'Зураг солихын тулд дээрх харандаа дээр дарна уу.')])
       ]);
-      settings.appendChild(file);settings.appendChild(save);settings.appendChild(msg);settingsPanel.appendChild(settings);
+      settings.appendChild(name);settings.appendChild(save);settings.appendChild(msg);settingsPanel.appendChild(settings);
+      editPanel.appendChild(el('h3',{class:'msr-profile-title'},'Edit Profile · Customize'));
+      editPanel.appendChild(el('p',{class:'msr-note'},'Профайл зураг, Frame, Banner, Effect-ээ эндээс тохируулна.'));
+      var photoButton=el('button',{type:'button',class:'msr-btn pri',onclick:function(){file.click();}},'✎ Change profile photo');
+      editPanel.appendChild(photoButton);
+      editPanel.appendChild(file);
+      editPanel.appendChild(el('p',{class:'msr-note'},'Зураг сонгосны дараа Save photo товчийг дарна.'));
+      var photoSave=el('button',{type:'button',class:'msr-btn',onclick:function(){save.click();}},'Save photo');
+      editPanel.appendChild(photoSave);
+      var cosmeticStatus=el('p',{class:'msr-note',role:'status'});
+      var cosmeticList=el('div',{class:'msr-profile-cosmetic-list'});
+      editPanel.appendChild(cosmeticStatus);editPanel.appendChild(cosmeticList);
+      (async function(){
+        var result=await sb.from('msr_shop_inventory').select('product_id,category,equipped').eq('user_id',S.user.id).order('acquired_at',{ascending:false});
+        if(!cosmeticList.isConnected)return;
+        if(result.error){cosmeticStatus.textContent='Inventory ачаалахад алдаа гарлаа.';return;}
+        var isAdmin=S.admin;
+        var owned=result.data||[];
+        var kinds=[['frame','Avatar Frame',1,12],['banner','Profile Banner',13,24],['effect','Profile Effect',25,30]];
+        kinds.forEach(function(kind){
+          var section=el('section',{class:'msr-profile-cosmetic-group'},el('h4',null,kind[1]));
+          var grid=el('div',{class:'msr-profile-cosmetic-grid'});
+          var choices=isAdmin?Array.from({length:kind[3]-kind[2]+1},function(_,i){return {product_id:'cos'+(kind[2]+i),category:kind[0],equipped:owned.some(function(it){return it.product_id==='cos'+(kind[2]+i)&&it.equipped;})};}):owned.filter(function(it){return it.category===kind[0];});
+          if(!choices.length)grid.appendChild(el('p',{class:'msr-note'},'Энэ төрлийн item одоогоор байхгүй.'));
+          choices.forEach(function(it){
+            var btn=el('button',{type:'button',class:'msr-btn msr-cosmetic-choice'+(it.equipped?' selected':''),onclick:async function(){
+              btn.disabled=true;cosmeticStatus.textContent='Applying...';
+              var response=await sb.rpc('msr_equip_cosmetic',{p_product_id:it.product_id});
+              btn.disabled=false;
+              if(response.error){cosmeticStatus.textContent='Equip failed: '+err(response.error);return;}
+              grid.querySelectorAll('.msr-cosmetic-choice').forEach(function(b){b.classList.remove('selected');b.textContent=b.dataset.label;});
+              btn.classList.add('selected');btn.textContent=btn.dataset.label+' ✓';
+              cosmeticStatus.textContent='Equipped: '+it.product_id;
+              var hero=box.querySelector('#msr-profile-hero');if(hero)hero.dispatchEvent(new Event('msr:cosmetic-change',{bubbles:true}));
+            }},it.product_id+(it.equipped?' ✓':''));
+            btn.dataset.label=it.product_id;grid.appendChild(btn);
+          });
+          section.appendChild(grid);cosmeticList.appendChild(section);
+        });
+      })();
       var claimBox = el('div', { style: 'margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:10px' }, el('b', null, 'Standoff 2 ID Verification'));
       settingsPanel.appendChild(claimBox);
       (async function () {
@@ -330,6 +370,7 @@
 .msr-prof{max-width:780px;margin:auto;padding-bottom:90px}.msr-discord-cover{height:140px;border-radius:20px 20px 0 0;background:radial-gradient(circle at 80% 20%,#3860a0,transparent 50%),linear-gradient(120deg,#101a30,#28345c 60%,#141a28);display:flex;align-items:flex-start;justify-content:flex-end;padding:16px;color:#c7d8fb;font-weight:800;letter-spacing:2px;font-size:11px}.msr-prof .msr-profile-hero{position:relative;margin-top:-42px;border-radius:0 0 20px 20px!important;background:#171c29!important;min-height:145px;box-shadow:none!important}.msr-prof .msr-profile-hero .hd{align-items:flex-end!important;gap:18px!important}.msr-prof .msr-avatar-edit-wrap{margin-top:-25px}.msr-profile-edit-btn{display:block!important;width:100%!important;margin:18px 0 10px!important;padding:14px!important;border-radius:12px!important;background:#5865f2!important;color:#fff!important;font-weight:800!important}.msr-profile-tabs{display:flex;gap:3px;overflow-x:auto;border-bottom:1px solid #354052;margin:14px 0 20px}.msr-profile-tabs button{flex:1;min-width:74px;background:transparent;border:0;color:#aeb5c8;padding:14px 8px;font-weight:800;font-size:14px;border-bottom:3px solid transparent;cursor:pointer}.msr-profile-tabs button.active{color:#9da9ff;border-bottom-color:#7788ff}.msr-profile-panel[hidden]{display:none!important}.msr-profile-promo{border:2px solid #7752df;border-radius:19px;padding:20px;margin:14px 0 18px;background:#24232f}.msr-profile-promo h3{margin:0 0 8px}.msr-profile-promo p{color:#bbc4d5}.msr-profile-promo button{width:100%;margin-top:10px}.msr-profile-stat{background:#1d222d;border-radius:17px;margin:12px 0;padding:19px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.msr-profile-stat span{color:#aeb8c9}.msr-profile-stat strong{font-size:16px}.msr-prof #msr-profile-settings{margin-top:10px}.msr-prof #msr-profile-settings[hidden]{display:none!important}@media(max-width:520px){.msr-discord-cover{height:110px}.msr-prof .msr-profile-hero .hd{flex-wrap:wrap}.msr-profile-tabs button{font-size:12px;min-width:65px}.msr-prof{padding-bottom:110px}}`;document.head.appendChild(style);})();
 
 (function(){var st=document.createElement('style');st.textContent='.msr-menu-avatar-link{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid #6ca9ed;background:#18273b;padding:0!important}.msr-menu-avatar-link .msr-av{width:100%!important;height:100%!important;object-fit:cover;border-radius:50%}.msr-menu-avatar-link span.msr-av{display:flex;align-items:center;justify-content:center}.msr-menu-avatar-link:hover{border-color:#b5c9ff}#mobile-auth-slot{margin:0!important;padding:0!important;border:0!important}';st.textContent+=".msr-menu-avatar-link{width:auto!important;max-width:100%;min-width:0;height:52px!important;border:0!important;border-radius:12px!important;overflow:hidden!important;justify-content:flex-start!important;gap:10px;padding:2px!important;text-decoration:none!important}.msr-menu-avatar-link .msr-av{flex:0 0 44px!important;width:44px!important;height:44px!important;border:2px solid #6ca9ed!important}.msr-menu-profile-name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;max-width:135px;color:#e7eefb;font-size:13px;font-weight:800}#mobile-auth-slot>.msr-btn{width:auto!important;min-width:100px!important}";document.head.appendChild(st);})();
+(function(){var st=document.createElement('style');st.textContent='.msr-profile-cosmetic-group{margin:16px 0;padding:14px;background:#1d2636;border-radius:14px}.msr-profile-cosmetic-group h4{margin:0 0 12px}.msr-profile-cosmetic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.msr-cosmetic-choice{font-size:12px!important;padding:10px 5px!important;min-width:0!important}.msr-cosmetic-choice.selected{border:2px solid #7db8ff!important;background:#2b527d!important;color:#fff!important}@media(max-width:390px){.msr-profile-cosmetic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}';document.head.appendChild(st);})();
   /* ---------- start ---------- */
   window.MSR = { comments: comments, profileView: profileView, openModal: openModal };
   drawBar();
