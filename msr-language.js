@@ -43,6 +43,7 @@ Object.assign(dict,{
 "Тоглогчдын төлөө бүтээгдсэн. Нийгэмлэгийн хүчээр хөгжинө.":"Built for the players. Powered by the community.",
 "МОНГОЛЫН STANDOFF ЦАХИМ СПОРТЫН ИРЭЭДҮЙ":"THE FUTURE OF MONGOLIAN STANDOFF ESPORTS"
 });
+Object.assign(dict,{"MSR нь Монголын Standoff 2 багуудын чансаа, тоглогчдын статистик, тоглолтын үр дүн болон тэмцээний мэдээллийг нэг дор харуулна.":"MSR brings Mongolian Standoff 2 team rankings, player statistics, match results and tournament information together in one place.","Багуудын ELO чансаа, тоглогчдын үзүүлэлт болон тоглолтын үр дүнг үзээрэй.":"Follow team ELO rankings, compare player performance and check the latest match results.","Чансаа. Статистик. Үр дүн. Нэг дор.":"Rankings. Stats. Results. All in one place."});
 var inverse={};Object.keys(dict).forEach(function(k){inverse[dict[k]]=k;});
 var current='en';try{current=localStorage.getItem('msr-language')==='mn'?'mn':'en';}catch(e){}
 function convert(s){if(!s||!s.trim())return s;var t=s.trim(),translated=(current==='en'?dict:inverse)[t];if(!translated){var m=t.match(/^ID: (.+?) · (Pending|Rejected|Verified) — (.+)$/);if(m){var tail=m[3];if(current==='en')tail=tail.replace('Discord-оор screenshot илгээнэ үү','Send a screenshot on Discord').replace('админтай холбогдоно уу','Contact admin');else tail=tail.replace('Send a screenshot on Discord','Discord-оор screenshot илгээнэ үү').replace('Contact admin','админтай холбогдоно уу');translated='ID: '+m[1]+' · '+m[2]+' — '+tail;}}
