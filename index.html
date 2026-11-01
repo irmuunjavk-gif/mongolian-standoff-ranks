@@ -1327,7 +1327,8 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
 #msr-profile-hero .msr-avatar-edit-wrap.msr-equipped-frame .msr-av{border-radius:50%!important;width:100%!important;height:100%!important}
 #msr-profile-hero.msr-equipped-banner{background:linear-gradient(110deg,#0a1121,var(--msr-banner-color,#263d66),#0c1326)!important;border:2px solid var(--msr-banner-color,#5d88cc)!important}
 #msr-profile-hero.msr-equipped-effect{box-shadow:0 0 22px var(--msr-effect-color,#70b6ff),inset 0 0 25px #7d65e855!important}
-</style></head>
+</style><style id="msr-custom-artwork">.msr-shop-preview img.msr-cosmetic-artwork{display:block;width:100%;height:100%;object-fit:contain;border-radius:10px}.msr-shop-item:has(.msr-cosmetic-artwork) .msr-shop-preview{background:radial-gradient(circle at center,#192842,#080f1d)}</style>
+</head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
 
@@ -3164,6 +3165,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
               h('i',null,''),h('i',null,''),h('i',null,''),h('i',null,''))
           : h('div', { class:'msr-shop-ring msr-shop-ring-art msr-frame-'+p.id,style:'--fx:'+p.color },
               h('div', { class:'msr-shop-face' }, 'MSR'));
+        if ([1,2,3,4,13,14,15,16,25,26,27,28].indexOf(Number(p.id.slice(3)))>=0) demo=h('img',{class:'msr-cosmetic-artwork',src:'assets/cosmetics/'+p.id+'.svg',alt:p.title+' cosmetic preview',loading:'lazy'});
         return h('div', { class:'msr-shop-item' },
           h('div', { class:'msr-shop-preview' }, demo),
           h('div', { class:'msr-shop-detail' }, h('span', { class:'msr-shop-kind' }, p.kind+' · MSR-'+String(p.id).replace('cos','').padStart(2,'0')), h('h3', null, p.title), h('p', null, p.desc),
