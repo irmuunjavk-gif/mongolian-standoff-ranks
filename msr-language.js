@@ -34,6 +34,15 @@ Object.assign(dict,{
 "MSR нь тасралтгүй хөгжиж буй нийгэмлэгийн төсөл юм. Шинэ баг, тэмцээн нэмэгдэхийн хэрээр боломжууд болон мэдээлэл сайжирна.":"MSR is an evolving community project. Features and data will continue to improve as tournaments and teams are added.",
 "Тэмцээнүүд үзэх →":"See Tournaments →"
 });
+Object.assign(dict,{
+"MSR-ийн албан ёсны танилцуулга · Нийтэд нээлттэй":"Official MSR introduction · Public",
+"Mongolian Standoff Ranks-д тавтай морил!":"Welcome to Mongolian Standoff Ranks!",
+"MSR бол Монголын Standoff 2 цахим спортын нийгэмлэгт зориулан бүтээсэн платформ юм.":"MSR is a community-driven platform created for the Mongolian Standoff 2 esports scene.",
+"Бидний зорилго бол багуудын чансаа, тоглогчдын статистик, тэмцээний үр дүн болон өрсөлдөөний мэдээллийг нэг дор нэгтгэж, баг тоглогчдын амжилтыг хүн бүрт ойлгомжтой, хүртээмжтэй хүргэх явдал юм.":"Our goal is to bring team rankings, player statistics, tournament results and competitive updates together in one place — making it easier for everyone to follow the teams and players shaping the scene.",
+"Шинээр гарч ирж буй багаас туршлагатай өрсөлдөгч хүртэл хүн бүрийг мэдээлэл, шударга чансаа, Standoff 2-т дурлах хүсэл тэмүүллээр холбож, нийгэмлэгээ хамтдаа хөгжүүлэхийг MSR зорьж байна.":"From emerging teams to experienced competitors, MSR aims to help the community grow through accessible information, fair rankings and a shared passion for Standoff 2.",
+"Тоглогчдын төлөө бүтээгдсэн. Нийгэмлэгийн хүчээр хөгжинө.":"Built for the players. Powered by the community.",
+"МОНГОЛЫН STANDOFF ЦАХИМ СПОРТЫН ИРЭЭДҮЙ":"THE FUTURE OF MONGOLIAN STANDOFF ESPORTS"
+});
 var inverse={};Object.keys(dict).forEach(function(k){inverse[dict[k]]=k;});
 var current='en';try{current=localStorage.getItem('msr-language')==='mn'?'mn':'en';}catch(e){}
 function convert(s){if(!s||!s.trim())return s;var t=s.trim(),translated=(current==='en'?dict:inverse)[t];if(!translated){var m=t.match(/^ID: (.+?) · (Pending|Rejected|Verified) — (.+)$/);if(m){var tail=m[3];if(current==='en')tail=tail.replace('Discord-оор screenshot илгээнэ үү','Send a screenshot on Discord').replace('админтай холбогдоно уу','Contact admin');else tail=tail.replace('Send a screenshot on Discord','Discord-оор screenshot илгээнэ үү').replace('Contact admin','админтай холбогдоно уу');translated='ID: '+m[1]+' · '+m[2]+' — '+tail;}}
