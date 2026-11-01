@@ -1684,29 +1684,6 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     var like = h('button', { type: 'button', class: liked ? 'active' : '', 'aria-pressed': liked ? 'true' : 'false' },
       h('span', { svg: '<svg viewBox="0 0 24 24"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3zm0 0 5-8c2-1 3 1 2 3l-1 5h6a3 3 0 0 1 3 3l-2 6a3 3 0 0 1-3 2H7"/></svg>' }), 'Like');
     like.addEventListener('click', function () { liked = !liked; put('liked', liked); like.classList.toggle('active', liked); like.setAttribute('aria-pressed', String(liked)); });
-    var commentsBox = h('div', { class: 'msr-comment-box' });
-    var commentBtn = h('button', { type: 'button', 'aria-expanded': 'false' },
-      h('span', { svg: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-5.5A9 9 0 1 1 21 11.5z"/></svg>' }), 'Comment');
-    var input = h('textarea', { placeholder: 'Сэтгэгдэл бичих...', 'aria-label': 'Сэтгэгдэл бичих', maxlength: '1000' });
-    var list = h('div', null);
-    function render() {
-      list.textContent = '';
-      entries.forEach(function (e) { list.appendChild(h('div', { class: 'comment' }, h('small', null, 'You · ' + e.time), h('div', null, e.text))); });
-    }
-    render();
-    var send = h('button', { type: 'button', class: 'send' }, 'Илгээх');
-    send.addEventListener('click', function () {
-      var value = input.value.trim(); if (!value) return;
-      entries.push({ text: value.slice(0, 1000), time: new Date().toLocaleString() });
-      put('comments', entries); input.value = ''; render();
-    });
-    commentsBox.appendChild(h('p', { class: 'note' }, 'Сэтгэгдэл зөвхөн таны энэ төхөөрөмж дээр хадгалагдана.'));
-    commentsBox.appendChild(input); commentsBox.appendChild(send); commentsBox.appendChild(list);
-    commentBtn.addEventListener('click', function () {
-      var on = !commentsBox.classList.contains('open');
-      commentsBox.classList.toggle('open', on); commentBtn.setAttribute('aria-expanded', String(on));
-      if (on) input.focus();
-    });
     var share = h('button', { type: 'button' },
       h('span', { svg: '<svg viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 13v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/></svg>' }), 'Share');
     share.addEventListener('click', function () {
@@ -1716,8 +1693,8 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
         navigator.clipboard.writeText(url).then(function () { share.lastChild.textContent = 'Link copied'; }).catch(function () { window.prompt('Copy article link:', url); });
       } else window.prompt('Copy article link:', url);
     });
-    actions.appendChild(like); actions.appendChild(commentBtn); actions.appendChild(share);
-    return h('div', null, actions, commentsBox);
+    actions.appendChild(like); actions.appendChild(share);
+    return h('div', null, actions);
   }
 
   V.article = function (id) {
