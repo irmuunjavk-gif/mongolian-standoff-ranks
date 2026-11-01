@@ -159,15 +159,49 @@
       });
       var hero=el('div', { class: 'msr-profile-hero' }, el('div', { class: 'hd' }, [avatarWrap, el('div', null, [el('b', { style: 'font-size:20px' }, p.username), el('span', { class: 'msr-bdg' }, S.admin ? 'ADMIN' : 'USER')])]));
       hero.id='msr-profile-hero';
+      var cover=el('div',{class:'msr-discord-cover'},el('span',null,'MSR · PLAYER PROFILE'));
+      box.appendChild(cover);
       box.appendChild(hero);
-      box.appendChild(el('button',{class:'msr-btn pri',type:'button',style:'margin:10px 0 16px',onclick:function(){var settings=box.querySelector('#msr-profile-settings');if(settings){settings.hidden=false;settings.scrollIntoView({behavior:'smooth',block:'start'});}}},'✎ Edit Profile'));
+      var editProfile=el('button',{class:'msr-btn pri msr-profile-edit-btn',type:'button',onclick:function(){showTab('settings');}},'✎ Edit Profile');
+      box.appendChild(editProfile);
+      var tabs=el('nav',{class:'msr-profile-tabs','aria-label':'Profile sections'});
+      var panels=el('div',{class:'msr-profile-panels'});
+      var mainPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-main'});
+      var activityPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-activity',hidden:true});
+      var inventoryPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-inventory',hidden:true});
+      var settingsPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-settings',hidden:true});
+      var tabsData=[['main','Main'],['activity','Activity'],['inventory','Inventory'],['settings','Settings']];
+      function showTab(id){tabsData.forEach(function(t){var pane=panels.querySelector('#msr-tab-'+t[0]);if(pane)pane.hidden=t[0]!==id;var btn=tabs.querySelector('[data-tab="'+t[0]+'"]');if(btn){btn.classList.toggle('active',t[0]===id);btn.setAttribute('aria-selected',String(t[0]===id));}});}
+      tabsData.forEach(function(t){tabs.appendChild(el('button',{type:'button','data-tab':t[0],class:t[0]==='main'?'active':'',onclick:function(){showTab(t[0]);}},t[1]));});
+      box.appendChild(tabs);
+      panels.appendChild(mainPanel);panels.appendChild(activityPanel);panels.appendChild(inventoryPanel);panels.appendChild(settingsPanel);box.appendChild(panels);
+      mainPanel.appendChild(el('div',{class:'msr-profile-promo'},[
+        el('h3',null,'Customize your MSR profile'),
+        el('p',null,'Unlock profile frames, banners and effects in the Shop.'),
+        el('button',{type:'button',class:'msr-btn pri',onclick:function(){location.hash='#shop';}},'🛍 Shop')
+      ]));
+      mainPanel.appendChild(el('div',{class:'msr-profile-stat'},[
+        el('span',null,'Member Since'),
+        el('strong',null,new Date(S.user.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}))
+      ]));
+      mainPanel.appendChild(el('div',{class:'msr-profile-stat'},[
+        el('span',null,'Account role'),
+        el('strong',null,S.admin?'ADMIN':'PLAYER')
+      ]));
+      activityPanel.appendChild(el('div',{class:'msr-profile-stat'},[
+        el('strong',null,'Your activity'),
+        el('p',null,'Your matches and tournament activity will appear here when available.')
+      ]));
+      inventoryPanel.appendChild(el('h3',null,'My Inventory'));
+      var inventoryRows=el('div');inventoryPanel.appendChild(inventoryRows);
+      (async function(){var items=await sb.from('msr_shop_inventory').select('product_id,category,equipped').eq('user_id',S.user.id).order('acquired_at',{ascending:false});if(!inventoryRows.isConnected)return;if(items.error){inventoryRows.textContent='Could not load inventory.';return;}if(!items.data.length){inventoryRows.textContent='No items equipped yet. Visit Shop to choose your cosmetics.';return;}items.data.forEach(function(it){var row=el('div',{class:'msr-profile-stat'},[el('span',null,it.product_id+' · '+it.category),el('strong',null,it.equipped?'Equipped':'Owned')]);inventoryRows.appendChild(row);});})();
       var settings=el('div',{id:'msr-profile-settings',class:'msr-profile-card',hidden:true},[
         el('h3',{class:'msr-profile-title'},'⚙ Account Settings'),
         el('dl',null,[el('dt',null,'Имэйл'),el('dd',null,S.user.email),el('dt',null,'Бүртгүүлсэн'),el('dd',null,new Date(S.user.created_at).toLocaleDateString('mn-MN')),el('dt',null,'Username'),el('dd',null,name),el('dt',null,'Профайл зураг'),el('dd',null,'Зураг солихын тулд дээрх харандаа дээр дарна уу.')])
       ]);
-      settings.appendChild(file);settings.appendChild(save);settings.appendChild(msg);box.appendChild(settings);
+      settings.appendChild(file);settings.appendChild(save);settings.appendChild(msg);settingsPanel.appendChild(settings);
       var claimBox = el('div', { style: 'margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:10px' }, el('b', null, 'Standoff 2 ID Verification'));
-      box.appendChild(claimBox);
+      settingsPanel.appendChild(claimBox);
       (async function () {
         var r = await sb.from('player_id_verifications').select('game_id,status').eq('user_id', S.user.id).maybeSingle();
         if (!box.isConnected) return;
@@ -207,7 +241,7 @@
             items.appendChild(row);
           });
         });
-        adminBox.appendChild(reload); adminBox.appendChild(items); box.appendChild(adminBox);
+        adminBox.appendChild(reload); adminBox.appendChild(items); settingsPanel.appendChild(adminBox);
       }
       box.appendChild(save); box.appendChild(msg); box.appendChild(el('button', { class: 'msr-profile-logout', type: 'button', onclick: async function () { var result = await sb.auth.signOut(); if (result.error) return toast(err(result.error), true); location.hash = '#news'; toast('Аккаунтаас гарлаа.'); } }, '↪ Аккаунтаас гарах'));
     }
@@ -285,6 +319,10 @@
     return root;
   }
 
+
+/* Discord-inspired MSR profile, responsive and functional */
+(function(){var style=document.createElement('style');style.textContent=`
+.msr-prof{max-width:780px;margin:auto;padding-bottom:90px}.msr-discord-cover{height:140px;border-radius:20px 20px 0 0;background:radial-gradient(circle at 80% 20%,#3860a0,transparent 50%),linear-gradient(120deg,#101a30,#28345c 60%,#141a28);display:flex;align-items:flex-start;justify-content:flex-end;padding:16px;color:#c7d8fb;font-weight:800;letter-spacing:2px;font-size:11px}.msr-prof .msr-profile-hero{position:relative;margin-top:-42px;border-radius:0 0 20px 20px!important;background:#171c29!important;min-height:145px;box-shadow:none!important}.msr-prof .msr-profile-hero .hd{align-items:flex-end!important;gap:18px!important}.msr-prof .msr-avatar-edit-wrap{margin-top:-25px}.msr-profile-edit-btn{display:block!important;width:100%!important;margin:18px 0 10px!important;padding:14px!important;border-radius:12px!important;background:#5865f2!important;color:#fff!important;font-weight:800!important}.msr-profile-tabs{display:flex;gap:3px;overflow-x:auto;border-bottom:1px solid #354052;margin:14px 0 20px}.msr-profile-tabs button{flex:1;min-width:74px;background:transparent;border:0;color:#aeb5c8;padding:14px 8px;font-weight:800;font-size:14px;border-bottom:3px solid transparent;cursor:pointer}.msr-profile-tabs button.active{color:#9da9ff;border-bottom-color:#7788ff}.msr-profile-panel[hidden]{display:none!important}.msr-profile-promo{border:2px solid #7752df;border-radius:19px;padding:20px;margin:14px 0 18px;background:#24232f}.msr-profile-promo h3{margin:0 0 8px}.msr-profile-promo p{color:#bbc4d5}.msr-profile-promo button{width:100%;margin-top:10px}.msr-profile-stat{background:#1d222d;border-radius:17px;margin:12px 0;padding:19px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.msr-profile-stat span{color:#aeb8c9}.msr-profile-stat strong{font-size:16px}.msr-prof #msr-profile-settings{margin-top:10px}.msr-prof #msr-profile-settings[hidden]{display:none!important}@media(max-width:520px){.msr-discord-cover{height:110px}.msr-prof .msr-profile-hero .hd{flex-wrap:wrap}.msr-profile-tabs button{font-size:12px;min-width:65px}.msr-prof{padding-bottom:110px}}`;document.head.appendChild(style);})();
   /* ---------- start ---------- */
   window.MSR = { comments: comments, profileView: profileView, openModal: openModal };
   drawBar();
