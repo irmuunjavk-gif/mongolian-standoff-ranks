@@ -2554,7 +2554,18 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   function rankApp() {
     var open = APR.open, cards = [];
     var dt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    function plAv(nick, code) { var team=T[code]||{}, avatar=h('span', { class: 'bigav sg' + tc({ team: code }), 'aria-hidden': 'true' }, sig(nick, 64)); if(team.img){ avatar.textContent=''; avatar.style.backgroundImage='url("'+team.img.replace(/"/g,'')+'")'; avatar.style.backgroundPosition='center'; avatar.style.backgroundSize='contain'; avatar.style.backgroundRepeat='no-repeat'; avatar.style.backgroundColor='transparent'; } return h('a', { class: 'ap-pl', href: playerHref(nick) }, avatar, h('span', { class: 'n' }, nick)); }
+    function plAv(nick, code) {
+      var team = T[code] || {};
+      var avatar = h('span', { class: 'bigav', 'aria-hidden': 'true' });
+      avatar.style.background = team.img ? 'transparent url("' + team.img.replace(/"/g, '') + '") center / contain no-repeat' : (team.c || '#3B4658');
+      avatar.style.borderRadius = '50%';
+      avatar.style.display = 'inline-flex';
+      avatar.style.alignItems = 'center';
+      avatar.style.justifyContent = 'center';
+      avatar.style.fontWeight = '700';
+      if (!team.img) avatar.textContent = team.i || 'MSR';
+      return h('a', { class: 'ap-pl', href: playerHref(nick) }, avatar, h('span', { class: 'n' }, nick));
+    }
     function setOpen(i) {
       open = open === i ? -1 : i; APR.open = open;
       cards.forEach(function (c, k) { var on = k === open; c.el.classList.toggle('open', on); c.btn.setAttribute('aria-expanded', on ? 'true' : 'false'); });
