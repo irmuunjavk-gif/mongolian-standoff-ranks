@@ -1086,6 +1086,15 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
  #mobile-auth-slot #msr-auth{display:flex;width:100%;justify-content:stretch}
  #mobile-auth-slot .msr-btn{width:100%;min-height:46px}
 }
+
+<style id="mobile-menu-visibility-fix">
+@media(max-width:760px){
+ header.top.open{z-index:200}
+ header.top.open #mmenu{display:flex!important;position:fixed;z-index:210;left:5%;right:5%;bottom:calc(96px + env(safe-area-inset-bottom));top:auto;max-height:min(65dvh,520px);overflow-y:auto;flex-direction:column;gap:2px;padding:12px 16px;background:#1c242e;border:1px solid #536176;border-radius:20px;box-shadow:0 12px 45px #000b}
+ header.top.open #mmenu>a{display:block;flex:none;font-size:16px;padding:12px 14px;min-height:44px}
+ header.top.open #mmenu #mobile-auth-slot{flex:none}
+}
+</style>
 </style>
 </head>
 <body>
@@ -1118,7 +1127,12 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
 
   <nav class="main mob" id="mmenu" aria-label="Mobile menu">
     <div class="search mq" hidden><input type="search" id="mq" aria-label="Search"></div>
-    <a href="#players" data-r="players">Player rank</a>
+    <a href="#players" data-r="players">Player Rank</a>
+    <a href="#ranking" data-r="ranking">Team Ranking</a>
+    <a href="#live" data-r="live">Live</a>
+    <a href="#results" data-r="results">Results</a>
+    <a href="#stats" data-r="stats">Stats</a>
+    <a href="#gold" data-r="gold">Gold</a>
     <div id="mobile-auth-slot"></div>
   </nav></header>
 <nav class="mobile-dock" aria-label="Quick navigation"><div class="dock-tabs"><a href="#matches" data-r="matches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M8 3v4M16 3v4"/></svg><span>Matches</span></a><a href="#news" data-r="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg><span>News</span></a><a href="#events" data-r="events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v6a4 4 0 0 1-8 0zM8 5H4v3a4 4 0 0 0 4 4M16 5h4v3a4 4 0 0 1-4 4M12 13v5M8 21h8M9 18h6"/></svg><span>Events</span></a></div><div id="mobile-burger-slot"></div></nav>
