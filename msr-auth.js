@@ -126,7 +126,7 @@
       box.textContent = '';
       var top=el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px'},[
         el('h1',{style:'margin:0'},'Профайл'),
-        el('button',{type:'button',class:'msr-btn',onclick:function(){var settings=box.querySelector('#msr-profile-settings');if(settings){settings.hidden=!settings.hidden;if(!settings.hidden)settings.scrollIntoView({behavior:'smooth',block:'start'});}}},'⚙ Settings')
+        el('button',{type:'button',class:'msr-btn',onclick:function(){var tab=box.querySelector('[data-tab="settings"]');if(tab){tab.click();tab.scrollIntoView({behavior:'smooth',block:'start'});}}},'⚙ Settings')
       ]);
       box.appendChild(top);
       if (!ok) { box.appendChild(el('p', { class: 'msr-note' }, 'Хэрэглэгчийн систем одоохондоо тохируулагдаагүй байна.')); return; }
@@ -176,7 +176,7 @@
       var inventoryPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-inventory',hidden:true});
       var settingsPanel=el('section',{class:'msr-profile-panel',id:'msr-tab-settings',hidden:true});
       var tabsData=[['main','Main'],['activity','Activity'],['inventory','Inventory'],['settings','Settings']];
-      function showTab(id){tabsData.forEach(function(t){var pane=panels.querySelector('#msr-tab-'+t[0]);if(pane)pane.hidden=t[0]!==id;var btn=tabs.querySelector('[data-tab="'+t[0]+'"]');if(btn){btn.classList.toggle('active',t[0]===id);btn.setAttribute('aria-selected',String(t[0]===id));}});}
+      function showTab(id){tabsData.forEach(function(t){var pane=panels.querySelector('#msr-tab-'+t[0]);if(pane)pane.hidden=t[0]!==id;var btn=tabs.querySelector('[data-tab="'+t[0]+'"]');if(btn){btn.classList.toggle('active',t[0]===id);btn.setAttribute('aria-selected',String(t[0]===id));}});var account=panels.querySelector('#msr-profile-settings');if(account)account.hidden=id!=='settings';}
       tabsData.forEach(function(t){tabs.appendChild(el('button',{type:'button','data-tab':t[0],class:t[0]==='main'?'active':'',onclick:function(){showTab(t[0]);}},t[1]));});
       box.appendChild(tabs);
       panels.appendChild(mainPanel);panels.appendChild(activityPanel);panels.appendChild(inventoryPanel);panels.appendChild(settingsPanel);box.appendChild(panels);
