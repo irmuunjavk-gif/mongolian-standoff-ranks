@@ -2376,7 +2376,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
           board('Best K/D ratio', 'Kills divided by deaths', top('kd'), function (g) { return g.kd.toFixed(2); })));
         body.appendChild(h('p', { class: 'mini' }, 'Rating is based on the public approximation of the Rating 2.0 formula: KAST, kills, deaths, impact and ADR per round.'));
       } else if (SF.tab === 'players') {
-        var cols = [{ l: '#' }, { k: 'nick', l: 'Player', text: 1 }, { k: 'maps', l: 'Maps', n: 1 }, { k: 'R', l: 'Rounds', n: 1 }, { l: 'K–D', n: 1 }, { k: 'diff', l: '+/−', n: 1 }, { k: 'kd', l: 'K/D', n: 1 }, { k: 'adr', l: 'ADR', n: 1 }, { k: 'kast', l: 'KAST', n: 1 }, { k: 'hsp', l: 'HS%', n: 1 }, { k: 'rating', l: 'Rating', n: 1 }];
+        var cols = [{ l: '#' }, { k: 'nick', l: 'Player', text: 1 }, { k: 'maps', l: 'Maps', n: 1 }, { k: 'R', l: 'Rounds', n: 1 }, { l: 'K–D', n: 1 }, { k: 'diff', l: '+/−', n: 1 }, { k: 'kd', l: 'K/D', n: 1 }, { k: 'adr', l: 'ADR', n: 1 }, { k: 'kast', l: 'KAST', n: 1 }, { k: 'rating', l: 'Rating', n: 1 }];
         var list = playerAggs(f).filter(function (g) { return g.maps >= +SF.min; });
         var draw2 = function () {
           body.textContent = '';
@@ -2385,7 +2385,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
             h('tbody', null, sorted.map(function (g, i) {
               return h('tr', { class: 'clk', onclick: go(playerHref(g.nick)) }, h('td', { class: 'pos' }, i + 1), h('td', null, playerCell(g.nick, g.team)), h('td', { class: 'n' }, g.maps), h('td', { class: 'n' }, g.R),
                 h('td', { class: 'n' }, g.k + '–' + g.d), h('td', { class: 'n ' + (g.diff > 0 ? 'pos' : g.diff < 0 ? 'neg' : '') }, (g.diff > 0 ? '+' : '') + g.diff), h('td', { class: 'n' }, g.kd.toFixed(2)),
-                h('td', { class: 'n' }, g.adr.toFixed(1)), h('td', { class: 'n' }, g.kast.toFixed(1) + '%'), h('td', { class: 'n' }, g.hsp.toFixed(1) + '%'), h('td', { class: 'n' }, rt(g.rating)));
+                h('td', { class: 'n' }, g.adr.toFixed(1)), h('td', { class: 'n' }, g.kast.toFixed(1) + '%'), h('td', { class: 'n' }, rt(g.rating)));
             }))))));
           if (!sorted.length) body.appendChild(h('div', { class: 'empty' }, 'No players match these filters.'));
           body.appendChild(h('p', { class: 'mini' }, sorted.length + ' players · click a column to sort · Rating is based on the public approximation of the Rating 2.0 formula.'));
@@ -2494,7 +2494,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       var rows = filterRows(PROWS[nick] || [], F), g = agg(rows);
       var recent = rows.slice().sort(function (a, b) { return b.date - a.date || b.m.id - a.m.id || b.mi - a.mi; });
       if (!rows.length) { host.appendChild(h('div', { class: 'empty' }, 'No maps recorded for these filters.')); sb.appendChild(h('div', { class: 'hl-empty' }, 'No maps recorded for these filters.')); return; }
-      var cards = [['Rating', g.rating.toFixed(2), 1], ['K/D', g.kd.toFixed(2)], ['ADR', g.adr.toFixed(1)], ['KAST', g.kast.toFixed(1) + '%'], ['Headshots', g.hsp.toFixed(1) + '%'], ['Kills / round', g.kpr.toFixed(2)], ['Deaths / round', g.dpr.toFixed(2)], ['Maps played', rows.length]];
+      var cards = [['Rating', g.rating.toFixed(2), 1], ['K/D', g.kd.toFixed(2)], ['ADR', g.adr.toFixed(1)], ['KAST', g.kast.toFixed(1) + '%'], ['Kills / round', g.kpr.toFixed(2)], ['Deaths / round', g.dpr.toFixed(2)], ['Maps played', rows.length]];
       cards.forEach(function (c) { sb.appendChild(h('div', { class: 'hl-cell' + (c[2] ? ' main' : '') }, h('span', { class: 'k' }, c[0]), h('span', { class: 'v' + (c[2] ? (g.rating >= 1 ? ' up' : ' dn') : '') }, c[1]))); });
       // rating trend
       var series2 = recent.slice(0, 20).reverse(), W = 560, H = 130, lo = 0.4, hi = 1.8, n = series2.length;
