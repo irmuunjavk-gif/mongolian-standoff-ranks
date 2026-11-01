@@ -1182,7 +1182,20 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
 .pl-grid .plc .s .v{font-size:14px!important;line-height:1.25!important}
 }
 </style>
-<style id="msr-demo-logo-label">.brand{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}.brand .msr-demo-mark{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.07em;line-height:1.2;padding:3px 5px;border:1px solid var(--line);border-radius:4px;color:var(--muted);background:var(--raised);opacity:.8}@media(max-width:760px){.brand{gap:4px}.brand .msr-demo-mark{font-size:7px;padding:2px 3px;letter-spacing:0}}</style></head>
+<style id="msr-demo-logo-label">.brand{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}.brand .msr-demo-mark{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.07em;line-height:1.2;padding:3px 5px;border:1px solid var(--line);border-radius:4px;color:var(--muted);background:var(--raised);opacity:.8}@media(max-width:760px){.brand{gap:4px}.brand .msr-demo-mark{font-size:7px;padding:2px 3px;letter-spacing:0}}</style><style id="msr-news-interactions">
+#mobile-header-query,.search input[type="search"],#mq{font-size:16px!important}
+.msr-article-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:24px 0 12px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.msr-article-actions button{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--muted);font:600 14px inherit;font-family:inherit;font-size:14px;padding:9px 12px;border-radius:8px;cursor:pointer}
+.msr-article-actions button:hover,.msr-article-actions button.active{color:var(--tracer);background:var(--raised)}
+.msr-article-actions svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.msr-comment-box{display:none;margin:12px 0 26px}.msr-comment-box.open{display:block}
+.msr-comment-box textarea{width:100%;box-sizing:border-box;min-height:82px;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--text);font-family:inherit;font-size:16px;resize:vertical}
+.msr-comment-box .send{margin:8px 0 12px;background:var(--steel);border:0;color:#fff;border-radius:8px;padding:9px 18px;font-weight:700;cursor:pointer}
+.msr-comment-box .comment{padding:10px 0;border-bottom:1px solid var(--line-soft);overflow-wrap:anywhere}
+.msr-comment-box .comment small{display:block;color:var(--dim);margin-bottom:4px}
+.msr-comment-box .note{font-size:12px;color:var(--dim);margin:6px 0}
+</style>
+</head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
 
@@ -1659,6 +1672,54 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       h('div', { class: 'hl-home' }, h('div', null, h('div', { class: 'news-grid' }, feature, side), h('div', { style: 'margin-top:18px' }, groups)), aside));
   };
 
+  // Per-article local interactions. Comments/likes are stored on this device,
+  // not represented as public server comments.
+  function newsActions(n) {
+    var key = 'msr-news-' + String(n.id);
+    function get(k, fallback) { try { return JSON.parse(localStorage.getItem(key + '-' + k)) || fallback; } catch (e) { return fallback; } }
+    function put(k, value) { try { localStorage.setItem(key + '-' + k, JSON.stringify(value)); } catch (e) {} }
+    var liked = !!get('liked', false), entries = get('comments', []);
+    if (!Array.isArray(entries)) entries = [];
+    var actions = h('div', { class: 'msr-article-actions' });
+    var like = h('button', { type: 'button', class: liked ? 'active' : '', 'aria-pressed': liked ? 'true' : 'false' },
+      h('span', { svg: '<svg viewBox="0 0 24 24"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3zm0 0 5-8c2-1 3 1 2 3l-1 5h6a3 3 0 0 1 3 3l-2 6a3 3 0 0 1-3 2H7"/></svg>' }), 'Like');
+    like.addEventListener('click', function () { liked = !liked; put('liked', liked); like.classList.toggle('active', liked); like.setAttribute('aria-pressed', String(liked)); });
+    var commentsBox = h('div', { class: 'msr-comment-box' });
+    var commentBtn = h('button', { type: 'button', 'aria-expanded': 'false' },
+      h('span', { svg: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-5.5A9 9 0 1 1 21 11.5z"/></svg>' }), 'Comment');
+    var input = h('textarea', { placeholder: 'Сэтгэгдэл бичих...', 'aria-label': 'Сэтгэгдэл бичих', maxlength: '1000' });
+    var list = h('div', null);
+    function render() {
+      list.textContent = '';
+      entries.forEach(function (e) { list.appendChild(h('div', { class: 'comment' }, h('small', null, 'You · ' + e.time), h('div', null, e.text))); });
+    }
+    render();
+    var send = h('button', { type: 'button', class: 'send' }, 'Илгээх');
+    send.addEventListener('click', function () {
+      var value = input.value.trim(); if (!value) return;
+      entries.push({ text: value.slice(0, 1000), time: new Date().toLocaleString() });
+      put('comments', entries); input.value = ''; render();
+    });
+    commentsBox.appendChild(h('p', { class: 'note' }, 'Сэтгэгдэл зөвхөн таны энэ төхөөрөмж дээр хадгалагдана.'));
+    commentsBox.appendChild(input); commentsBox.appendChild(send); commentsBox.appendChild(list);
+    commentBtn.addEventListener('click', function () {
+      var on = !commentsBox.classList.contains('open');
+      commentsBox.classList.toggle('open', on); commentBtn.setAttribute('aria-expanded', String(on));
+      if (on) input.focus();
+    });
+    var share = h('button', { type: 'button' },
+      h('span', { svg: '<svg viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 13v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/></svg>' }), 'Share');
+    share.addEventListener('click', function () {
+      var url = location.href.split('#')[0] + '#article/' + encodeURIComponent(n.id);
+      if (navigator.share) { navigator.share({ title: n.h, text: n.lead, url: url }).catch(function () {}); }
+      else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () { share.lastChild.textContent = 'Link copied'; }).catch(function () { window.prompt('Copy article link:', url); });
+      } else window.prompt('Copy article link:', url);
+    });
+    actions.appendChild(like); actions.appendChild(commentBtn); actions.appendChild(share);
+    return h('div', null, actions, commentsBox);
+  }
+
   V.article = function (id) {
     var n = NEWS.filter(function (x) { return String(x.id) === String(id); })[0];
     if (!n) return V.news();
@@ -1671,6 +1732,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       h('p', { style: 'font-weight:600;color:#E9EDF3' }, n.lead),
       n.body.map(function (p) { return typeof p === 'string' ? h('p', null, p) : h('figure', { class: 'fig' + (p.figs.length > 1 ? ' grid' : '') }, p.figs.map(function (x) { return h('div', { class: 'art', svg: x }); }), p.cap ? h('figcaption', null, p.cap) : null); }),
       n.live ? h('button', { class: 'btn', type: 'button', svg: ICON.play + '<span>Watch match</span>', onclick: function () { openMatch(M[0]); } }) : null,
+      newsActions(n),
       h('div', { class: 'related' }, h('div', { class: 'grp-h' }, 'Бусад мэдээ'),
         h('div', { class: 'box' }, rel.map(function (r) { return h('a', { class: 'nrow', href: '#article/' + r.id }, flag(), h('span', { class: 'hd' }, r.h), h('span', { class: 'tm' }, r.t), comments(r.c)); }))));
   };
