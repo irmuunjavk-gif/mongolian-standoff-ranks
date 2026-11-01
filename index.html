@@ -3348,6 +3348,10 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     var u=await user();area.replaceChildren();
     var title=document.createElement('h2');title.textContent='My Inventory';area.appendChild(title);
     if(!u){var p=document.createElement('p');p.textContent='Log in to view your owned items and orders.';area.appendChild(p);return}
+    var role=await client.rpc('msr_is_shop_admin'),isAdmin=!role.error&&role.data===true;
+    shop.dataset.shopAdmin=isAdmin?'true':'false';
+    if(isAdmin){var tip=document.createElement('p');tip.textContent='ADMIN · All 30 items are free. Choose any Shop item to equip it instantly.';tip.style.cssText='color:#60e6a0;font-weight:700';area.appendChild(tip);
+      Array.from(shop.querySelectorAll('.msr-shop-item')).forEach(function(card){var btn=card.querySelector('.msr-shop-buy');if(btn)btn.textContent='Equip free'})}
     var res=await client.from('msr_shop_inventory').select('product_id,category,equipped').eq('user_id',u.id);
     if(res.error){area.appendChild(document.createTextNode('Inventory unavailable: '+res.error.message));return}
     var items=res.data||[];
@@ -3369,6 +3373,9 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     var u=await user();if(!u){alert('Please log in before placing an order.');return}
     busy=true;
     try{
+      var admin=await client.rpc('msr_is_shop_admin');
+      if(admin.error)throw admin.error;
+      if(admin.data===true){var equip=await client.rpc('msr_equip_cosmetic',{p_product_id:id});if(equip.error)throw equip.error;await refresh();return}
       var owned=await client.from('msr_shop_inventory').select('product_id').eq('user_id',u.id).eq('product_id',id).maybeSingle();
       if(owned.data){alert('You already own this item.');return}
       var pending=await client.from('msr_shop_orders').select('id,product_id').eq('user_id',u.id).eq('product_id',id).eq('status','pending').order('created_at',{ascending:false}).limit(1);
