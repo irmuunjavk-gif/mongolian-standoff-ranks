@@ -139,7 +139,7 @@
   function comments(aid) {
     aid = String(aid); var root = el('section', { class: 'msr-cm', 'aria-label': 'Сэтгэгдэл' });
     if (!ok) { root.appendChild(el('h3', null, 'Сэтгэгдэл')); root.appendChild(el('p', { class: 'msr-note' }, 'Сэтгэгдлийн систем одоохондоо тохируулагдаагүй байна.')); return root; }
-    var head = el('h3', null, 'Сэтгэгдэл'), formBox = el('div'), list = el('div'), more = el('button', { class: 'msr-btn', type: 'button', style: 'margin-top:12px', onclick: function () { page(); } }, 'Дахин ачаалах'), shown = 0, liked = {};
+    var head = el('h3', null, 'Сэтгэгдэл'), formBox = el('div'), list = el('div'), more = el('button', { class: 'msr-btn', type: 'button', style: 'margin-top:12px', onclick: function () { page(); } }, 'Дахин ачаалах'), shown = 0, liked = {}, generation = 0;
     root.appendChild(head); root.appendChild(formBox); root.appendChild(list); root.appendChild(more);
     function form(parent, onDone, prefix) {
       if (!S.user) return el('button', { class: 'msr-btn', type: 'button', onclick: function () { openModal('login'); } }, 'Сэтгэгдэл бичихийн тулд нэвтэрнэ үү');
@@ -175,8 +175,9 @@
       if (!top) return node;
       var wrap = el('div', null, node); if (replies && replies.length) wrap.appendChild(el('div', { class: 'msr-rep' }, replies.map(function (r) { return item(r, false, likedSet); }))); return wrap;
     }
-    async function count() { var r = await sb.from('news_comments').select('id', { count: 'exact', head: true }).eq('article_id', aid); head.textContent = 'Сэтгэгдэл (' + (r.count || 0) + ')'; }
+    async function count() { var version = generation; var r = await sb.from('news_comments').select('id', { count: 'exact', head: true }).eq('article_id', aid); if (version !== generation || r.error) return; head.textContent = 'Сэтгэгдэл (' + (r.count || 0) + ')'; }
     async function page() {
+      var version = generation;
       more.disabled = true;
       try {
         var r = await sb.from('news_comments').select(SEL).eq('article_id', aid).is('parent_id', null).order('created_at', { ascending: false }).range(shown, shown + PAGE - 1); if (r.error) throw r.error;
@@ -190,13 +191,14 @@
             (lk.data || []).forEach(function (x) { liked[x.comment_id] = 1; });
           }
         }
+        if (version !== generation) return;
         rows.forEach(function (c) { list.appendChild(item(c, true, liked, reps[c.id])); });
         shown += rows.length; more.style.display = rows.length === PAGE ? '' : 'none';
         if (!shown) list.appendChild(el('p', { class: 'msr-note' }, 'Одоохондоо сэтгэгдэл алга. Эхний сэтгэгдлийг та бичээрэй.'));
       } catch (x) { toast(err(x), true); } finally { more.disabled = false; }
     }
     function drawForm() { formBox.textContent = ''; formBox.appendChild(form(null, reload)); }
-    function reload() { shown = 0; liked = {}; list.textContent = ''; more.style.display = 'none'; drawForm(); count(); return page(); }
+    function reload() { generation++; shown = 0; liked = {}; list.textContent = ''; more.style.display = 'none'; drawForm(); count(); return page(); }
     function onAuth() { if (!root.isConnected) { document.removeEventListener('msr:auth', onAuth); return; } reload(); }
     document.addEventListener('msr:auth', onAuth);
     reload();
