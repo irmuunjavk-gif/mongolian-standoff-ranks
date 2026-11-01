@@ -1133,6 +1133,18 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
 }
 </style>
 
+<style id="msr-results-team-search-style">
+.results-team-search{position:relative;display:flex;flex-direction:column;gap:5px;min-width:138px}
+.results-team-search>label{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.results-team-search input[type="search"]{box-sizing:border-box;width:100%;min-width:138px;min-height:37px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 30px 8px 11px;font-family:inherit;font-size:16px;font-weight:500;letter-spacing:0;outline:none;appearance:none;-webkit-appearance:none}
+.results-team-search input[type="search"]::placeholder{color:var(--dim);opacity:1}
+.results-team-search input[type="search"]:hover{border-color:var(--steel)}
+.results-team-search input[type="search"]:focus{border-color:var(--steel);box-shadow:0 0 0 2px rgba(136,153,174,.16)}
+.results-team-search .team-search-options{position:absolute;top:100%;left:0;right:0;z-index:40;max-height:220px;overflow-y:auto;margin-top:4px;padding:5px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,.35)}
+.results-team-search .team-search-options button{display:block;width:100%;padding:10px 11px;text-align:left;background:transparent;border:0;border-radius:6px;color:var(--text);font:500 13px inherit;cursor:pointer}
+.results-team-search .team-search-options button:hover,.results-team-search .team-search-options button:focus{background:rgba(136,153,174,.15);outline:none}
+@media(max-width:760px){.results-team-search{width:100%}.results-team-search input[type="search"]{font-size:16px!important;touch-action:manipulation}}
+</style>
 <style id="msr-results-collapsible-filter">
 .results-filter-toggle{display:none}
 @media(max-width:760px){
@@ -2370,21 +2382,21 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
     }
     function set(k) { return function (v) { RF[k] = v; RF.page = 0; draw(); }; }
     var flt = h('div', { class: 'flt' }, sel('Date', DATEOPT, RF.days, set('days')), sel('Event', EVOPT, RF.ev, set('ev')), sel('Map', MAPOPT, RF.map, set('map')), (function () {
-      var wrap = h('div', { class: 'f' });
+      var wrap = h('div', { class: 'results-team-search' });
       var label = h('label', null, 'Team');
       var search = h('input', { type: 'search', placeholder: 'Search team...', autocomplete: 'off', 'aria-label': 'Search results by team', style: 'width:100%;min-width:0' });
-      var suggestions = h('div', { style: 'max-height:180px;overflow-y:auto;display:none;border:1px solid #384151;border-radius:8px;margin-top:4px' });
+      var suggestions = h('div', { class: 'team-search-options', style: 'display:none' });
       function options() {
         suggestions.textContent = '';
         var q = search.value.trim().toLocaleLowerCase();
         var opts = TEAMOPT.filter(function (x) { return x[0] !== 'all' && String(x[1]).toLocaleLowerCase().indexOf(q) !== -1; }).slice(0, 25);
         if (!q) { suggestions.style.display = 'none'; return; }
         suggestions.style.display = 'block';
-        var all = h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;padding:8px' }, 'All teams');
+        var all = h('button', { type: 'button', class: 'team-search-option' }, 'All teams');
         all.addEventListener('click', function () { search.value = ''; suggestions.style.display = 'none'; set('team')('all'); });
         suggestions.appendChild(all);
         opts.forEach(function (x) {
-          var btn = h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;padding:8px' }, x[1]);
+          var btn = h('button', { type: 'button', class: 'team-search-option' }, x[1]);
           btn.addEventListener('click', function () { search.value = x[1]; suggestions.style.display = 'none'; set('team')(x[0]); });
           suggestions.appendChild(btn);
         });
