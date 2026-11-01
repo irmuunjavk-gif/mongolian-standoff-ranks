@@ -1285,37 +1285,33 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
  #mmenu #mobile-auth-slot{padding:0!important}
 }
 </style>
-<style id="msr-bottom-sheet-menu-2026">
+
+<style id="msr-mobile-menu-compact-only">
 @media(max-width:760px){
- body.msr-menu-open::before{content:"";position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:190;pointer-events:none}
- body.msr-menu-open #mmenu,header.top.open #mmenu{
-  display:flex!important;position:fixed!important;top:auto!important;
-  bottom:0!important;left:0!important;right:0!important;width:100%!important;
-  max-height:90dvh!important;height:auto!important;min-height:0!important;
-  padding:22px 22px calc(34px + env(safe-area-inset-bottom))!important;
-  background:#1d232b!important;border:0!important;border-radius:36px 36px 0 0!important;
-  box-shadow:0 -18px 60px #0009!important;z-index:300!important;
-  flex-direction:column!important;gap:0!important;overflow-y:auto!important;
-  overscroll-behavior:contain!important;
+ header.top.open #mmenu,body.msr-menu-open #mmenu{
+  top:12px!important;
+  bottom:calc(90px + env(safe-area-inset-bottom))!important;
+  height:auto!important;
+  max-height:calc(100dvh - 110px - env(safe-area-inset-bottom))!important;
+  padding:8px 12px!important;
+  gap:0!important;
+  overflow-y:auto!important;
  }
- #mmenu .msr-menu-top{order:0!important;display:flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:space-between!important;padding:0 0 12px!important;margin:0 0 12px!important;border-bottom:1px solid #38424e!important}
- #mmenu .msr-menu-top #mobile-auth-slot{flex:1!important;min-width:0!important}
- #mmenu .msr-menu-profile-name{max-width:140px!important;font-size:14px!important}
- #mmenu .msr-language-options button{min-width:42px!important;font-size:12px!important;padding:9px 7px!important}
- #mmenu .search.mq{display:block!important;order:1!important;flex:0 0 auto!important;width:100%!important;margin:0 0 16px!important}
- #mmenu .search.mq input{display:block!important;width:100%!important;height:46px!important;border-radius:11px!important;background:#2b333e!important;border:1px solid #3e4b5c!important;color:#f0f4fc!important;font-size:14px!important;padding:10px 13px!important}
- #mmenu>a,header.top.open #mmenu>a{order:2!important;display:flex!important;align-items:center!important;flex:0 0 auto!important;gap:14px!important;min-height:52px!important;padding:12px 3px!important;margin:0!important;border:0!important;border-bottom:1px solid #ffffff17!important;border-radius:0!important;background:transparent!important;color:#e1e5eb!important;font-size:17px!important;font-weight:650!important;line-height:1.2!important}
- #mmenu>a::before{content:"▣";width:25px;flex:0 0 25px;text-align:center;color:#d5dae2;font-size:19px}
- #mmenu>a[data-r="players"]::before{content:"♟"}
- #mmenu>a[data-r="ranking"]::before{content:"▥"}
- #mmenu>a[data-r="live"]::before{content:"●";color:#ed5555}
- #mmenu>a[data-r="results"]::before{content:"▤"}
- #mmenu>a[data-r="stats"]::before{content:"▥"}
- #mmenu>a[data-r="gold"]::before{content:"✦";color:#f4d06a}
- #mmenu>a[data-r="vip"]::before{content:"★";color:#bca4ff}
- #mmenu>a.on{color:#fff!important}
- #mmenu>a.on::after{display:none!important}
- #mobile-burger-slot{z-index:310!important}
+ #mmenu .msr-menu-top{
+  padding:2px 4px 7px!important;
+  margin:0 0 4px!important;
+  min-height:46px!important;
+ }
+ #mmenu>a,header.top.open #mmenu>a{
+  min-height:0!important;
+  padding:8px 10px!important;
+  font-size:13px!important;
+  line-height:1.15!important;
+  letter-spacing:0!important;
+ }
+ #mmenu .msr-menu-avatar-link{height:40px!important}
+ #mmenu .msr-menu-avatar-link .msr-av{height:36px!important;width:36px!important;flex-basis:36px!important}
+ #mmenu .msr-language-options button{padding:7px!important;min-width:42px!important;font-size:12px!important}
 }
 </style>
 </head>
