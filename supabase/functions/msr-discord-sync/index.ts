@@ -13,7 +13,7 @@ function parse(content:string){
  const tag=lines.map(s=>clean(s).match(/^(?:(?:clan|team)\s*)?tag\s*[:：=\/\-]\s*(.+)$/i)).find(Boolean)?.[1]?.replace(/[『』\[\]]/g,'').trim()||'';
  if(!name||name.length>100||!norm(name))return null;
  name=name.replace(/[👑亗乂]/gu,'').replace(/\s*\[[^\]]{1,20}\]\s*$/,'').trim();
- const roster:string[]=[];
+ const roster:string[]=[]; const player_ids:Record<string,string>={};
  function nickname(prefix:string){
   return clean(prefix)
    .replace(/^(?:\[\s*\]\s*)?(?:(?:team\s*)?captain|main|sub(?:stitute)?s?|player|тоглогч|ахлагч)\s*\d*\s*[:：–—-]?\s*/i,'')
@@ -34,10 +34,10 @@ function parse(content:string){
   else if(/^\s*(?:[-#•~]\s*)?ID\s*[:：-]?\s*$/i.test(prefix)) prefix=lines[i-1]||'';
   const nick=nickname(prefix);
   if(!nick||nick.length>40||/https?:|clan|captain|roster|^main$|^sub$|name\s*:/i.test(nick)||/\d{5,}/.test(nick))continue;
-  if(!roster.includes(nick))roster.push(nick);
+  if(!roster.includes(nick))roster.push(nick); player_ids[nick]=match[0];
  }
  if(roster.length<5||roster.length>12)return null;
- return {name,tag:tag.slice(0,30),name_key:norm(name),roster};
+ return {name,tag:tag.slice(0,30),name_key:norm(name),roster,player_ids};
 }
 async function logo(attachments:any[],id:string){
  const a=attachments?.find(a=>['image/png','image/jpeg','image/webp'].includes(a.content_type)&&a.size<=2097152);
@@ -59,7 +59,7 @@ Deno.serve(async(req)=>{
  let imported=0,seen=0,skipped=0;let before='';
  try{
   const bot=Deno.env.get('DISCORD_BOT_TOKEN');if(!bot)throw Error('missing_bot_token');
-  const known=await db('msr_discord_teams?select=id,name_key,source_message_id,source_timestamp');
+  const known=await db('msr_discord_teams?select=id,name_key,source_message_id,source_timestamp,player_ids');
   const map=new Map(known.map((x:any)=>[x.name_key,x]));
   for(let page=0;page<10;page++){
    const r=await fetch('https://discord.com/api/v10/channels/1563893301269237812/messages?limit=100'+(before?'&before='+before:''),{headers:{Authorization:'Bot '+bot}});
@@ -69,7 +69,7 @@ Deno.serve(async(req)=>{
     seen++;const snapshot=m.message_snapshots?.[0]?.message; const source=snapshot||m; const team=parse(source.content||'');if(!team){skipped++;continue;}
     const prev:any=map.get(team.name_key)||known.find((x:any)=>x.source_message_id===m.id);
     const timestamp=m.edited_timestamp||m.timestamp;
-    if(prev && Date.parse(prev.source_timestamp) >= Date.parse(timestamp)) continue;
+    if(prev && Object.keys(prev.player_ids||{}).length && Date.parse(prev.source_timestamp) >= Date.parse(timestamp)) continue;
     const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(team.name_key)))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
     const id=prev?.id||'ds_'+hash;
     const image=await logo(source.attachments||m.attachments,id).catch(()=>null);
