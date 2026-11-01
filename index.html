@@ -890,6 +890,12 @@ html .plc .av.sg { width: 62px; height: 62px; }
 .article .fig.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; } .article .fig.grid figcaption { grid-column: 1 / -1; }
 .article .fig figcaption { margin-top: 8px; font-size: 12.5px; color: var(--muted); text-align: center; }
 @media (max-width: 480px) { .article .fig.grid { gap: 6px; } }
+
+/* MSR cosmetics collection: compact responsive cards */
+.msr-shop-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.msr-shop-preview{height:140px}.msr-shop-ring{width:90px;height:90px;padding:6px}.msr-shop-face{font-size:17px}.msr-shop-ring-art:before{background:conic-gradient(from 20deg,var(--fx),transparent 24%,var(--fx) 43%,#fff 48%,var(--fx) 56%,transparent 72%,var(--fx));box-shadow:0 0 16px var(--fx);animation:msr-spin 5s linear infinite}.msr-shop-ring-art:after{content:'✦';position:absolute;top:-8px;right:4px;color:var(--fx);font-size:23px;text-shadow:0 0 9px var(--fx);animation:msr-frost 2s infinite alternate}
+.msr-banner-art{height:82px;width:94%;background:radial-gradient(circle at 70% 30%,var(--fx),transparent 35%),linear-gradient(145deg,#070c17,#172538 60%,#060a12);border:1px solid var(--fx);font-size:29px;letter-spacing:0;overflow:hidden;animation:msr-aurora 7s ease infinite;background-size:160% 160%}.msr-banner-art span{filter:drop-shadow(0 0 12px var(--fx))}.msr-shop-effect-art{font-size:64px;color:var(--fx);text-shadow:0 0 25px var(--fx);animation:msr-frost 2s infinite alternate}.msr-shop-detail{padding:11px}.msr-shop-detail h3{font-size:15px;margin:5px 0}.msr-shop-detail p{font-size:11px;min-height:0;margin:4px 0}.msr-shop-foot{margin-top:9px;flex-wrap:wrap}.msr-shop-foot b{font-size:15px}.msr-shop-buy{font-size:10px;padding:7px 8px}
+@media(max-width:850px){.msr-shop-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:580px){.msr-shop-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.msr-shop-preview{height:125px}.msr-shop-detail{padding:10px}.msr-shop-ring{width:82px;height:82px}.msr-shop-detail h3{font-size:14px}.msr-shop-foot b{font-size:14px}}
 </style>
 
 <style id="polish">
@@ -2973,35 +2979,45 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
   // Keep authentication views inside the existing router.
   V.shop = function () {
     var products = [
-      { id:'neon', title:'Neon Pulse', kind:'Avatar Frame', cls:'msr-fx-neon', price:'3,000₮', desc:'Animated neon pulse cosmetic effect' },
-      { id:'fire', title:'Inferno', kind:'Avatar Frame', cls:'msr-fx-fire', price:'4,000₮', desc:'Animated inferno cosmetic effect' },
-      { id:'galaxy', title:'Galaxy Orbit', kind:'Avatar Frame', cls:'msr-fx-galaxy', price:'5,000₮', desc:'Animated galaxy orbit cosmetic effect' },
-      { id:'ice', title:'Frost', kind:'Avatar Frame', cls:'msr-fx-ice', price:'3,500₮', desc:'Animated frost cosmetic effect' },
-      { id:'banner', title:'Aurora Waves', kind:'Profile Banner', cls:'msr-fx-banner', price:'5,000₮', desc:'Animated aurora waves cosmetic effect' },
-      { id:'badge', title:'Legend Glow', kind:'Name Effect', cls:'msr-fx-badge', price:'2,500₮', desc:'Animated legend glow cosmetic effect' },
-      { id:'emerald', title:'Emerald Vortex', kind:'Avatar Frame', cls:'msr-fx-emerald', price:'4,000₮', desc:'Animated emerald vortex cosmetic effect' },
-      { id:'golden', title:'Golden Crown', kind:'Avatar Frame', cls:'msr-fx-golden', price:'5,000₮', desc:'Animated golden crown cosmetic effect' },
-      { id:'rainbow', title:'Prismatic Spin', kind:'Avatar Frame', cls:'msr-fx-rainbow', price:'4,500₮', desc:'Animated prismatic spin cosmetic effect' },
-      { id:'cyber', title:'Cyber Circuit', kind:'Avatar Frame', cls:'msr-fx-cyber', price:'4,000₮', desc:'Animated cyber circuit cosmetic effect' },
-      { id:'heart', title:'Heart Beat', kind:'Avatar Frame', cls:'msr-fx-heart', price:'3,500₮', desc:'Animated heart beat cosmetic effect' },
-      { id:'shadow', title:'Dark Matter', kind:'Avatar Frame', cls:'msr-fx-shadow', price:'4,500₮', desc:'Animated dark matter cosmetic effect' },
-      { id:'electric', title:'Thunder Arc', kind:'Avatar Frame', cls:'msr-fx-electric', price:'5,000₮', desc:'Animated thunder arc cosmetic effect' },
-      { id:'sunset', title:'Solar Flare', kind:'Avatar Frame', cls:'msr-fx-sunset', price:'4,000₮', desc:'Animated solar flare cosmetic effect' },
-      { id:'sakura', title:'Sakura Bloom', kind:'Avatar Frame', cls:'msr-fx-sakura', price:'3,500₮', desc:'Animated sakura bloom cosmetic effect' },
-      { id:'ocean', title:'Ocean Current', kind:'Avatar Frame', cls:'msr-fx-ocean', price:'3,500₮', desc:'Animated ocean current cosmetic effect' },
-      { id:'lava', title:'Lava Burst', kind:'Avatar Frame', cls:'msr-fx-lava', price:'4,500₮', desc:'Animated lava burst cosmetic effect' },
-      { id:'royal', title:'Royal Amethyst', kind:'Avatar Frame', cls:'msr-fx-royal', price:'5,000₮', desc:'Animated royal amethyst cosmetic effect' },
-      { id:'starlight', title:'Starlight Trail', kind:'Avatar Frame', cls:'msr-fx-starlight', price:'5,000₮', desc:'Animated starlight trail cosmetic effect' },
-      { id:'glitch', title:'Digital Glitch', kind:'Avatar Frame', cls:'msr-fx-glitch', price:'4,500₮', desc:'Animated digital glitch cosmetic effect' }
+      { id:'cos1', title:"Neon Pulse", kind:"Avatar Frame", color:'#00caff', price:'3,000₮', desc:'Animated avatar decoration' },
+      { id:'cos2', title:"Inferno", kind:"Avatar Frame", color:'#ff5a22', price:'4,000₮', desc:'Animated avatar decoration' },
+      { id:'cos3', title:"Galaxy Orbit", kind:"Avatar Frame", color:'#aa5aff', price:'5,000₮', desc:'Animated avatar decoration' },
+      { id:'cos4', title:"Frost", kind:"Avatar Frame", color:'#9feaff', price:'3,500₮', desc:'Animated avatar decoration' },
+      { id:'cos5', title:"Toxic", kind:"Avatar Frame", color:'#6dff3a', price:'4,500₮', desc:'Animated avatar decoration' },
+      { id:'cos6', title:"Crimson", kind:"Avatar Frame", color:'#ff244b', price:'5,000₮', desc:'Animated avatar decoration' },
+      { id:'cos7', title:"Royal", kind:"Avatar Frame", color:'#ffc64d', price:'6,000₮', desc:'Animated avatar decoration' },
+      { id:'cos8', title:"Titan", kind:"Avatar Frame", color:'#cbd6e5', price:'5,500₮', desc:'Animated avatar decoration' },
+      { id:'cos9', title:"Shadow", kind:"Avatar Frame", color:'#a12bff', price:'4,500₮', desc:'Animated avatar decoration' },
+      { id:'cos10', title:"Thunder", kind:"Avatar Frame", color:'#248aff', price:'5,000₮', desc:'Animated avatar decoration' },
+      { id:'cos11', title:"Viper", kind:"Avatar Frame", color:'#4dff88', price:'4,500₮', desc:'Animated avatar decoration' },
+      { id:'cos12', title:"Venom", kind:"Avatar Frame", color:'#dbe8ee', price:'5,000₮', desc:'Animated avatar decoration' },
+      { id:'cos13', title:"Raven Night", kind:"Profile Banner", color:'#9eafc8', price:'6,000₮', desc:'Profile background banner' },
+      { id:'cos14', title:"Bloodzone", kind:"Profile Banner", color:'#ef3348', price:'6,000₮', desc:'Profile background banner' },
+      { id:'cos15', title:"Toxic Wave", kind:"Profile Banner", color:'#31db81', price:'5,500₮', desc:'Profile background banner' },
+      { id:'cos16', title:"Frost Peak", kind:"Profile Banner", color:'#9fceff', price:'5,500₮', desc:'Profile background banner' },
+      { id:'cos17', title:"Galaxy", kind:"Profile Banner", color:'#a569ff', price:'6,000₮', desc:'Profile background banner' },
+      { id:'cos18', title:"Dragon", kind:"Profile Banner", color:'#ffbc43', price:'7,000₮', desc:'Profile background banner' },
+      { id:'cos19', title:"Samurai", kind:"Profile Banner", color:'#ef4a4a', price:'6,000₮', desc:'Profile background banner' },
+      { id:'cos20', title:"Cyber City", kind:"Profile Banner", color:'#3dbdff', price:'5,500₮', desc:'Profile background banner' },
+      { id:'cos21', title:"Smoke", kind:"Profile Banner", color:'#c5d3e1', price:'5,000₮', desc:'Profile background banner' },
+      { id:'cos22', title:"Glitch", kind:"Profile Banner", color:'#f04cf5', price:'5,000₮', desc:'Profile background banner' },
+      { id:'cos23', title:"Forest", kind:"Profile Banner", color:'#4dbb83', price:'4,500₮', desc:'Profile background banner' },
+      { id:'cos24', title:"Sakura", kind:"Profile Banner", color:'#ffa4df', price:'5,500₮', desc:'Profile background banner' },
+      { id:'cos25', title:"Particle", kind:"Profile Effect", color:'#d9e6ff', price:'3,000₮', desc:'Animated profile effect' },
+      { id:'cos26', title:"Energy Aura", kind:"Profile Effect", color:'#28b4ff', price:'4,000₮', desc:'Animated profile effect' },
+      { id:'cos27', title:"Ember", kind:"Profile Effect", color:'#ff592e', price:'3,500₮', desc:'Animated profile effect' },
+      { id:'cos28', title:"Snowfall", kind:"Profile Effect", color:'#c2e9ff', price:'3,000₮', desc:'Animated profile effect' },
+      { id:'cos29', title:"Rain", kind:"Profile Effect", color:'#73a9ef', price:'3,000₮', desc:'Animated profile effect' },
+      { id:'cos30', title:"Glitch Effect", kind:"Profile Effect", color:'#c34dff', price:'4,000₮', desc:'Animated profile effect' }
     ];
     return h('div', { class:'msr-shop' },
       h('div', { class:'msr-shop-head' }, h('span', { class:'msr-shop-kicker' }, 'MSR COSMETICS'), h('h1', null, '✨ MSR Shop'), h('p', null, 'Animated avatar decorations, banners and profile effects. Preview the first collection below.')),
       h('div', { class:'msr-shop-grid' }, products.map(function(p) {
-        var demo = p.id === 'banner'
-          ? h('div', { class:'msr-shop-banner msr-fx-banner' }, h('span', null, 'MSR'))
-          : p.id === 'badge'
-          ? h('div', { class:'msr-shop-name msr-fx-badge' }, '★ LEGEND')
-          : h('div', { class:'msr-shop-ring '+p.cls }, h('div', { class:'msr-shop-face' }, 'MSR'));
+        var demo = p.kind === 'Profile Banner'
+          ? h('div', { class:'msr-shop-banner msr-banner-art', style:'--fx:'+p.color }, h('span',null,p.title==='Raven Night'?'☾ 🐦‍⬛':p.title==='Dragon'?'🐉':p.title==='Sakura'?'🌸':p.title==='Frost Peak'?'🏔️':p.title==='Samurai'?'⚔️':p.title==='Forest'?'🌲':'✦'))
+          : p.kind === 'Profile Effect'
+          ? h('div',{class:'msr-shop-effect-art',style:'--fx:'+p.color},h('span',null,p.title==='Snowfall'?'❄':p.title==='Ember'?'✦':p.title==='Rain'?'☔':'✧'))
+          : h('div', { class:'msr-shop-ring msr-shop-ring-art',style:'--fx:'+p.color }, h('div', { class:'msr-shop-face' }, 'MSR'));
         return h('div', { class:'msr-shop-item' },
           h('div', { class:'msr-shop-preview' }, demo),
           h('div', { class:'msr-shop-detail' }, h('span', { class:'msr-shop-kind' }, p.kind), h('h3', null, p.title), h('p', null, p.desc),
