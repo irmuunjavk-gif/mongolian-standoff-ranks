@@ -243,7 +243,7 @@
             btn.dataset.label=it.product_id;
             btn.textContent='';btn.appendChild(el('span',{class:'msr-cosmetic-label'},it.product_id+(it.equipped?' ✓':'')));
             var preview=el('div',{class:'msr-cosmetic-preview msr-cosmetic-'+kind[0],style:'--cosmetic-color:'+(['#00caff','#ff5a22','#aa5aff','#9feaff','#6dff3a','#ff244b','#ffc64d','#cbd6e5','#a12bff','#248aff','#4dff88','#dbe8ee','#9eafc8','#ef3348','#31db81','#9fceff','#a569ff','#ffbc43','#ef4a4a','#3dbdff','#c5d3e1','#f04cf5','#4dbb83','#ffa4df','#d9e6ff','#28b4ff','#ff592e','#c2e9ff','#73a9ef','#c34dff'][Number(it.product_id.slice(3))-1]||'#6daaff')},kind[0]==='frame'?'MSR':kind[0]==='banner'?'MSR BANNER':'✦');
-            if([1,2,3,4,13,14,15,16,25,26,27,28].indexOf(Number(it.product_id.slice(3)))>=0){preview.textContent='';preview.classList.add('msr-cosmetic-preview-art');preview.appendChild(el('img',{src:'assets/cosmetics/'+it.product_id+'.svg',alt:it.product_id+' cosmetic'}));}
+            if([1,2,3,4,13,14,15,16,25,26,27,28].indexOf(Number(it.product_id.slice(3)))>=0){preview.textContent='';preview.classList.add('msr-cosmetic-preview-art');preview.appendChild(el('img',{src:(window.MSR_COSMETIC_ART||function(){return '';})(it.product_id),alt:it.product_id+' cosmetic'}));}
             btn.prepend(preview);
             grid.appendChild(btn);
           });

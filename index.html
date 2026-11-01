@@ -1328,7 +1328,16 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
 #msr-profile-hero.msr-equipped-banner{background:linear-gradient(110deg,#0a1121,var(--msr-banner-color,#263d66),#0c1326)!important;border:2px solid var(--msr-banner-color,#5d88cc)!important}
 #msr-profile-hero.msr-equipped-effect{box-shadow:0 0 22px var(--msr-effect-color,#70b6ff),inset 0 0 25px #7d65e855!important}
 </style><style id="msr-custom-artwork">.msr-shop-preview img.msr-cosmetic-artwork{display:block;width:100%;height:100%;object-fit:contain;border-radius:10px}.msr-shop-item:has(.msr-cosmetic-artwork) .msr-shop-preview{background:radial-gradient(circle at center,#192842,#080f1d)}</style>
-</head>
+<style id="msr-png-equipped-art">
+#msr-profile-hero{position:relative;isolation:isolate;overflow:hidden}
+#msr-profile-hero>.hd{position:relative;z-index:2}
+#msr-profile-hero .msr-equipped-art{pointer-events:none;user-select:none}
+#msr-profile-hero .msr-equipped-frame-art{position:absolute;width:136%;height:136%;max-width:none;left:-18%;top:-18%;object-fit:fill;z-index:3}
+#msr-profile-hero .msr-avatar-edit-wrap:has(.msr-equipped-frame-art){border:0!important;box-shadow:none!important}
+#msr-profile-hero .msr-avatar-edit-wrap .msr-avatar-pencil{z-index:5}
+#msr-profile-hero .msr-equipped-banner-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.65;z-index:-2}
+#msr-profile-hero .msr-equipped-effect-art{position:absolute;inset:0 0 0 auto;width:48%;height:100%;object-fit:cover;opacity:.6;mix-blend-mode:screen;z-index:-1}
+</style></head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
 
@@ -3120,6 +3129,8 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
   V.events = eventsApp;
 
   // Keep authentication views inside the existing router.
+  function cosmeticArt(id){var n=Number(String(id).replace(/^cos/,'')),kind=n>=1&&n<=4?'frame':n>=13&&n<=16?'banner':n>=25&&n<=28?'effect':null;if(!kind)return '';var k=kind==='frame'?n:kind==='banner'?n-12:n-24;return 'assets/cosmetics/'+kind+'_'+String(k).padStart(2,'0')+'.png';}
+  window.MSR_COSMETIC_ART=cosmeticArt;
   V.shop = function () {
     var products = [
       { id:'cos1', title:"Neon Pulse", kind:"Avatar Frame", color:'#00caff', price:'3,000₮', desc:'Animated avatar decoration' },
@@ -3165,7 +3176,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
               h('i',null,''),h('i',null,''),h('i',null,''),h('i',null,''))
           : h('div', { class:'msr-shop-ring msr-shop-ring-art msr-frame-'+p.id,style:'--fx:'+p.color },
               h('div', { class:'msr-shop-face' }, 'MSR'));
-        if ([1,2,3,4,13,14,15,16,25,26,27,28].indexOf(Number(p.id.slice(3)))>=0) demo=h('img',{class:'msr-cosmetic-artwork',src:'assets/cosmetics/'+p.id+'.svg',alt:p.title+' cosmetic preview',loading:'lazy'});
+        if ([1,2,3,4,13,14,15,16,25,26,27,28].indexOf(Number(p.id.slice(3)))>=0) demo=h('img',{class:'msr-cosmetic-artwork',src:cosmeticArt(p.id),alt:p.title+' cosmetic preview',loading:'lazy'});
         return h('div', { class:'msr-shop-item' },
           h('div', { class:'msr-shop-preview' }, demo),
           h('div', { class:'msr-shop-detail' }, h('span', { class:'msr-shop-kind' }, p.kind+' · MSR-'+String(p.id).replace('cos','').padStart(2,'0')), h('h3', null, p.title), h('p', null, p.desc),
@@ -3440,18 +3451,23 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     var u=await user();if(!u)return;
     var result=await client.from('msr_shop_inventory').select('product_id,category,equipped').eq('user_id',u.id).eq('equipped',true);
     if(result.error||!hero.isConnected)return;
+    var items=result.data||[];
+    var signature=JSON.stringify(items.map(function(it){return [it.product_id,it.category];}).sort());
+    if(hero.dataset.cosmeticsPainted===signature)return;
+    hero.dataset.cosmeticsPainted=signature;
     var wrap=hero.querySelector('.msr-avatar-edit-wrap');
+    hero.querySelectorAll('.msr-equipped-art').forEach(function(e){e.remove();});
     var old=hero.querySelector('#msr-equipped-cosmetics');if(old)old.remove();
     var oldBanner=hero.querySelector('#msr-equipped-banner');if(oldBanner)oldBanner.remove();
     var oldEffect=hero.querySelector('#msr-equipped-effect');if(oldEffect)oldEffect.remove();
     if(wrap){Array.from(wrap.classList).filter(function(c){return /^msr-frame-cos/.test(c)}).forEach(function(c){wrap.classList.remove(c)});wrap.classList.remove('msr-equipped-frame');wrap.style.removeProperty('--msr-ring-color');}
     hero.classList.remove('msr-equipped-banner','msr-equipped-effect');
     Array.from(hero.classList).filter(function(c){return /^msr-(banner|effect)-cos/.test(c)}).forEach(function(c){hero.classList.remove(c)});
-    var items=result.data||[];
     var colors=['#00caff','#ff5a22','#aa5aff','#9feaff','#6dff3a','#ff244b','#ffc64d','#cbd6e5','#a12bff','#248aff','#4dff88','#dbe8ee','#9eafc8','#ef3348','#31db81','#9fceff','#a569ff','#ffbc43','#ef4a4a','#3dbdff','#c5d3e1','#f04cf5','#4dbb83','#ffa4df','#d9e6ff','#28b4ff','#ff592e','#c2e9ff','#73a9ef','#c34dff'];
     items.forEach(function(it){
       var n=Number((it.product_id||'').replace(/^cos/,''));if(!Number.isInteger(n)||n<1||n>30)return;
-      var color=colors[n-1];
+      var color=colors[n-1], art=window.MSR_COSMETIC_ART(it.product_id);
+      if(art){var img=document.createElement('img');img.className='msr-equipped-art msr-equipped-'+it.category+'-art';img.src=art;img.alt=it.product_id+' '+it.category;img.setAttribute('aria-hidden','true');if(it.category==='frame'&&wrap)wrap.appendChild(img);else hero.prepend(img);}
       if(it.category==='frame'&&wrap){wrap.classList.add('msr-equipped-frame','msr-frame-'+it.product_id);wrap.style.setProperty('--msr-ring-color',color);}
       if(it.category==='banner'){
         hero.classList.add('msr-equipped-banner','msr-banner-'+it.product_id);
