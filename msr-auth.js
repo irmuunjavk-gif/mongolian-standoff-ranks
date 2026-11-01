@@ -103,7 +103,12 @@
     var tabs = (mode === 'login' || mode === 'register') ? el('div', { class: 'msr-tabs' }, [['login', 'Нэвтрэх'], ['register', 'Бүртгүүлэх']].map(function (t) { return el('button', { type: 'button', class: 'msr-btn' + (mode === t[0] ? ' on' : ''), onclick: function () { openModal(t[0]); } }, t[1]); })) : null;
     var google = (mode === 'login' || mode === 'register') ? [el('div', { class: 'msr-or' }, 'эсвэл'), el('button', { class: 'msr-btn', type: 'button', onclick: function () { if (C.GOOGLE_AUTH_ENABLED !== true) return toast('Google нэвтрэлт хараахан идэвхжээгүй байна. Имэйлээр нэвтэрнэ үү.', true); sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: BACK } }).then(function (r) { if (r.error) toast(err(r.error), true); }); } }, 'Google-ээр нэвтрэх')] : [];
     var extra = mode === 'login' ? el('button', { class: 'msr-btn link', type: 'button', onclick: function () { openModal('forgot'); } }, 'Нууц үгээ мартсан уу?') : mode === 'forgot' ? el('button', { class: 'msr-btn link', type: 'button', onclick: function () { openModal('login'); } }, '← Нэвтрэх рүү буцах') : null;
-    d.appendChild(el('h2', null, title)); if (tabs) d.appendChild(tabs); d.appendChild(form); google.forEach(function (g) { d.appendChild(g); }); if (extra) d.appendChild(extra);
+    var info = (mode === 'login' || mode === 'register') ? el('section', { class:'msr-login-info', style:'margin:10px 0 16px;padding:12px;border:1px solid var(--line,#2A3645);border-radius:10px;background:var(--raised,#1E2836);font-size:12.5px;line-height:1.65' }, [
+      el('strong', null, mode === 'login' ? 'MSR аккаунтаараа нэвтрэх' : 'MSR аккаунт үүсгэх'),
+      el('p', { style:'margin:6px 0 0' }, mode === 'login' ? 'Бүртгэлтэй имэйл, нууц үгээ оруулна. Нэвтэрсний дараа профайл, Shop захиалга болон Inventory-гаа харах боломжтой.' : 'Username, Standoff 2 ID, имэйл, 8-аас дээш тэмдэгттэй нууц үг шаардлагатай. Имэйл баталгаажуулалт шаардагдаж болно.'),
+      el('p', { style:'margin:6px 0 0;color:var(--muted,#8899AE)' }, mode === 'login' ? 'Нууц үгээ мартсан бол доорх сэргээх холбоосыг ашиглаарай.' : 'Standoff 2 ID-г зөвхөн өөрийнхөө ID-аар бүртгүүлнэ. ID-г админ баталгаажуулна. Нууц үгээ хэнд ч бүү өг.')
+    ]) : null;
+    d.appendChild(el('h2', null, title)); if (tabs) d.appendChild(tabs); if(info)d.appendChild(info); d.appendChild(form); google.forEach(function (g) { d.appendChild(g); }); if (extra) d.appendChild(extra);
     d.appendChild(el('button', { class: 'msr-btn link', type: 'button', onclick: closeModal, 'aria-label': 'Хаах', style: 'position:absolute;right:10px;top:10px' }, '✕'));
     d.showModal();
   }
