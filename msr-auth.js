@@ -174,7 +174,7 @@
         var reload = el('button', { class: 'msr-btn', type: 'button' }, 'Хүсэлтүүдийг ачаалах');
         var items = el('div');
         reload.addEventListener('click', async function () {
-          items.textContent = ''; var res = await sb.from('player_id_verifications').select('user_id,game_id,status,created_at').order('created_at', { ascending: false }).limit(100);
+          items.textContent = ''; var res = await sb.from('player_id_verifications').select('user_id,game_id,status').order('game_id', { ascending: true }).limit(100);
           if (res.error) return toast(err(res.error), true);
           res.data.forEach(function (v) {
             var edit = el('input', { type: 'text', value: v.game_id, maxlength: 20, inputmode: 'numeric', style: 'font-size:16px;width:130px;max-width:100%' });
