@@ -3060,7 +3060,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
               h('div', { class:'msr-shop-face' }, 'MSR'));
         return h('div', { class:'msr-shop-item' },
           h('div', { class:'msr-shop-preview' }, demo),
-          h('div', { class:'msr-shop-detail' }, h('span', { class:'msr-shop-kind' }, p.kind), h('h3', null, p.title), h('p', null, p.desc),
+          h('div', { class:'msr-shop-detail' }, h('span', { class:'msr-shop-kind' }, p.kind+' · MSR-'+String(p.id).replace('cos','').padStart(2,'0')), h('h3', null, p.title), h('p', null, p.desc),
             h('div', { class:'msr-shop-foot' }, h('b', null, p.price), h('button', { type:'button', class:'msr-shop-buy', onclick:function(){ var panel=document.getElementById('msr-shop-payment'); if(!panel)return; panel.hidden=false; panel.querySelector('[data-product]').textContent=p.title+' — '+p.price; panel.scrollIntoView({behavior:'smooth',block:'center'}); } }, 'Payment info'))));
       })),
       h('section', { id:'msr-shop-payment', class:'msr-shop-payment', hidden:true }, h('h2',null,'Bank transfer · Manual confirmation'), h('p', { 'data-product':'' }, 'Select an item'), h('p',null,'Bank: ХасБанк (XacBank)'), h('p',null,'Account holder: Irmuun'), h('div', {class:'msr-shop-account'}, h('strong',null,'860032005005749717'), h('button',{type:'button',onclick:function(){navigator.clipboard && navigator.clipboard.writeText('860032005005749717').then(function(){alert('Account number copied');}).catch(function(){prompt('Copy account number','860032005005749717');});}},'Copy')), h('p',null,'Transfer description: your MSR username + item name. Contact the admin with your transfer receipt before paying to confirm availability.'), h('a',{href:'https://discord.com/users/1128188613230874727',target:'_blank',rel:'noopener noreferrer',class:'msr-shop-contact'},'Contact admin on Discord'), h('p',{class:'msr-shop-warning'},'No automatic payment confirmation yet. Items will not be unlocked automatically. Please confirm with the admin before transferring.')), 
@@ -3295,6 +3295,22 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
   if(!client)return;
   var busy=false;
   function category(id){var n=Number(String(id).replace('cos',''));return n<=12?'frame':n<=24?'banner':'effect'}
+  function code(id){return 'MSR-'+String(id).replace(/^cos/,'').padStart(2,'0')}
+  function reference(u,order){return 'MSR-'+u.id.replace(/-/g,'').slice(0,8).toUpperCase()+'-'+code(order.product_id).slice(4)+'-'+order.id.replace(/-/g,'').slice(0,8).toUpperCase()}
+  function paymentInstructions(shop,u,order){
+    var panel=shop.querySelector('#msr-shop-payment');if(!panel)return;
+    panel.hidden=false;
+    var desc=reference(u,order);
+    var product=panel.querySelector('[data-product]');if(product)product.textContent=code(order.product_id)+' · Order '+order.id.slice(0,8);
+    var old=panel.querySelector('#msr-transfer-reference');if(old)old.remove();
+    var wrap=document.createElement('div');wrap.id='msr-transfer-reference';
+    var heading=document.createElement('strong');heading.textContent='Гүйлгээний утга (яг хуулж оруулна):';
+    var value=document.createElement('code');value.textContent=desc;value.style.cssText='display:block;overflow-wrap:anywhere;margin:8px 0;padding:10px;background:#111722;border-radius:7px;user-select:all';
+    var copy=document.createElement('button');copy.type='button';copy.className='msr-shop-buy';copy.textContent='Copy transfer description';
+    copy.onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(desc).then(function(){copy.textContent='Copied!'}).catch(function(){prompt('Copy',desc)});else prompt('Copy',desc)};
+    var note=document.createElement('p');note.textContent='Код дотор таны ID, item код, захиалгын ID багтсан. Төлбөрийг админ шалгаж баталгаажуулах хүртэл item нээгдэхгүй.';
+    wrap.append(heading,value,copy,note);panel.insertBefore(wrap,panel.querySelector('.msr-shop-warning'));panel.scrollIntoView({behavior:'smooth',block:'center'});
+  }
   async function user(){var x=await client.auth.getUser();return x.data&&x.data.user}
   async function refresh(){
     var shop=document.querySelector('.msr-shop');if(!shop)return;
@@ -3314,8 +3330,8 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       btn.onclick=async function(){btn.disabled=true;var out=await client.rpc('msr_equip_cosmetic',{p_product_id:item.product_id});if(out.error)alert(out.error.message);await refresh()};
       row.append(label,btn);area.appendChild(row);
     });
-    var orders=await client.from('msr_shop_orders').select('product_id,status,created_at').eq('user_id',u.id).order('created_at',{ascending:false}).limit(10);
-    if(!orders.error&&(orders.data||[]).length){var h=document.createElement('h3');h.textContent='Recent orders';area.appendChild(h);orders.data.forEach(function(o){var p=document.createElement('p');p.textContent=o.product_id+' · '+o.status;area.appendChild(p)})}
+    var orders=await client.from('msr_shop_orders').select('id,product_id,status,created_at').eq('user_id',u.id).order('created_at',{ascending:false}).limit(10);
+    if(!orders.error&&(orders.data||[]).length){var h=document.createElement('h3');h.textContent='Recent orders';area.appendChild(h);orders.data.forEach(function(o){var p=document.createElement('p');p.textContent=code(o.product_id)+' · '+o.status+' · '+reference(u,o);area.appendChild(p)})}
   }
   document.addEventListener('click',async function(e){
     var btn=e.target.closest('.msr-shop-buy');if(!btn||!btn.closest('.msr-shop-item')||busy)return;
@@ -3326,10 +3342,11 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     try{
       var owned=await client.from('msr_shop_inventory').select('product_id').eq('user_id',u.id).eq('product_id',id).maybeSingle();
       if(owned.data){alert('You already own this item.');return}
-      var pending=await client.from('msr_shop_orders').select('id').eq('user_id',u.id).eq('product_id',id).eq('status','pending').limit(1);
+      var pending=await client.from('msr_shop_orders').select('id,product_id').eq('user_id',u.id).eq('product_id',id).eq('status','pending').order('created_at',{ascending:false}).limit(1);
       if(pending.error)throw pending.error;
-      if(!pending.data.length){var out=await client.from('msr_shop_orders').insert({user_id:u.id,product_id:id});if(out.error)throw out.error}
-      alert('Order request saved. Bank transfer is NOT automatically verified yet. Confirm with admin before sending money.');
+      var order=pending.data[0];
+      if(!order){var out=await client.from('msr_shop_orders').insert({user_id:u.id,product_id:id}).select('id,product_id').single();if(out.error)throw out.error;order=out.data}
+      paymentInstructions(shop,u,order);
       await refresh();
     }catch(err){alert('Could not save order: '+err.message)}finally{busy=false}
   });
