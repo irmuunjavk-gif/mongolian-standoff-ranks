@@ -1395,20 +1395,35 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       PLAYERS.push({ nick: nick, team: code, maps: 0, kills: 0, deatkd: 0 });
     });
   });
-  // Map-adjusted KD: low sample sizes are shrunk toward 1.0.
-  // At 10 maps, half of the weight comes from the observed KD.
+  // MSR custom player rating (not official HLTV rating).
+  // Under 5 maps: provisional. At 10+ maps: fully eligible.
+  // Shrink small samples and weight results against stronger teams.
   function playerRankScore(p) {
     var maps = Math.max(0, Number(p.maps) || 0);
+    var rating = Math.max(0, Number(p.rating) || 0);
     var kd = Math.max(0, Number(p.kd) || 0);
-    return 1 + (kd - 1) * maps / (maps + 10);
+    var raw = rating > 0 ? rating : kd;
+    var sample = maps / (maps + 8);
+    var rows = typeof PROWS !== 'undefined' && PROWS[p.nick] || [];
+    var weighted = 0, weightTotal = 0;
+    rows.forEach(function (row) {
+      var opp = RANK.filter(function (x) { return x[0] === row.opp; })[0];
+      var strength = opp ? Math.max(0.85, Math.min(1.15, 0.85 + (Number(opp[1]) || 0) / 2000)) : 1;
+      weighted += strength * (Number(row.R) || 1);
+      weightTotal += Number(row.R) || 1;
+    });
+    var opponentFactor = weightTotal ? weighted / weightTotal : 1;
+    return (1 + (raw - 1) * sample) * opponentFactor;
   }
   function sortPlayerRanking() {
     PLAYERS.sort(function (a, b) {
-      return playerRankScore(b) - playerRankScore(a) ||
-        (Number(b.maps) || 0) - (Number(a.maps) || 0) ||
-        (Number(b.kd) || 0) - (Number(a.kd) || 0);
+      var eligibleA = (Number(a.maps) || 0) >= 5 ? 1 : 0;
+      var eligibleB = (Number(b.maps) || 0) >= 5 ? 1 : 0;
+      return eligibleB - eligibleA ||
+        playerRankScore(b) - playerRankScore(a) ||
+        (Number(b.maps) || 0) - (Number(a.maps) || 0);
     });
-    PLAYERS.forEach(function (p, i) { p.rank = i + 1; });
+    PLAYERS.forEach(function (p, i) { p.rank = i + 1; p.msrRating = playerRankScore(p); p.provisional = (Number(p.maps) || 0) < 5; });
   }
   sortPlayerRanking();
 
@@ -1780,10 +1795,10 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
         wrap.appendChild(h('a', { class: 'plc', href: playerHref(p.nick) },
           h('div', { class: 'top' }, h('span', { class: 'av sg' + tc(p), title: p.nick }, sig(p.nick, 54)),
             h('div', null, h('div', { class: 'nk' }, tagEl(p.team), p.nick), gameIdEl(p.nick, p.team), h('div', { class: 'tm' }, crest(p.team), T[p.team].n)),
-            h('span', { class: 'rank' }, '#' + p.rank)),
+            h('span', { class: 'rank' }, p.provisional ? 'Provisional' : '#' + p.rank)),
           h('div', { class: 'row3' },
             h('div', { class: 's kd' }, h('div', { class: 'k' }, 'KD'), h('div', { class: 'v' }, p.kd.toFixed(2))),
-            h('div', { class: 's' }, h('div', { class: 'k' }, 'Rating'), h('div', { class: 'v' }, p.rating.toFixed(2))),
+            h('div', { class: 's' }, h('div', { class: 'k' }, 'MSR Rating'), h('div', { class: 'v' }, p.msrRating.toFixed(2))),
             h('div', { class: 's' }, h('div', { class: 'k' }, 'Maps'), h('div', { class: 'v' }, p.maps)))));
       });
       more.style.display = matched.length > 20 ? 'block' : 'none';
@@ -1798,7 +1813,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       chips.appendChild(b);
     });
     draw();
-    return h('div', null, pageHead('Players', PLAYERS.length + ' players, ranked by map-adjusted KD (more maps = more reliable ranking). The top 20 receive gold every 6 months.'), chips, wrap, more);
+    return h('div', null, pageHead('Players', PLAYERS.length + ' players, ranked by MSR Rating (performance, map sample and opponent strength). Under 5 maps: provisional; 10+ maps: fully qualified. The top 20 receive gold every 6 months.'), chips, wrap, more);
   };
 
   V.live = function () {
