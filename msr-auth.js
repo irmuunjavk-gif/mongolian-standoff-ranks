@@ -118,7 +118,12 @@
     var box = el('div', { class: 'msr-prof' });
     function draw() {
       if (!box.isConnected && box.dataset.m) { document.removeEventListener('msr:auth', draw); return; } box.dataset.m = '1';
-      box.textContent = ''; box.appendChild(el('h1', null, 'Профайл'));
+      box.textContent = '';
+      var top=el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px'},[
+        el('h1',{style:'margin:0'},'Профайл'),
+        el('button',{type:'button',class:'msr-btn',onclick:function(){var settings=box.querySelector('#msr-profile-settings');if(settings){settings.hidden=!settings.hidden;if(!settings.hidden)settings.scrollIntoView({behavior:'smooth',block:'start'});}}},'⚙ Settings')
+      ]);
+      box.appendChild(top);
       if (!ok) { box.appendChild(el('p', { class: 'msr-note' }, 'Хэрэглэгчийн систем одоохондоо тохируулагдаагүй байна.')); return; }
       if (!S.user) { box.appendChild(el('p', { class: 'msr-note' }, 'Профайлаа харахын тулд нэвтэрнэ үү.')); box.appendChild(el('button', { class: 'msr-btn pri', type: 'button', onclick: function () { openModal('login'); } }, 'Нэвтрэх / Бүртгүүлэх')); return; }
       var p = S.profile || { username: '' }, msg = el('p', { class: 'msr-msg', role: 'status' });
@@ -152,8 +157,15 @@
         if (img) { var preview = URL.createObjectURL(f); img.onload = function () { URL.revokeObjectURL(preview); }; img.src = preview; }
         say('Зураг сонгогдлоо. Хадгалах товчийг дарна уу.');
       });
-      box.appendChild(el('div', { class: 'msr-profile-hero' }, el('div', { class: 'hd' }, [avatarWrap, el('div', null, [el('b', { style: 'font-size:20px' }, p.username), el('span', { class: 'msr-bdg' }, S.admin ? 'ADMIN' : 'USER')])])));
-      box.appendChild(el('div', { class: 'msr-profile-card' }, [el('h3', { class: 'msr-profile-title' }, 'Аккаунтын мэдээлэл'), el('dl', null, [el('dt', null, 'Имэйл'), el('dd', null, S.user.email), el('dt', null, 'Бүртгүүлсэн'), el('dd', null, new Date(S.user.created_at).toLocaleDateString('mn-MN')), el('dt', null, 'Username'), el('dd', null, name), el('dt', null, 'Профайл зураг'), el('dd', null, 'Зураг солихын тулд дээрх харандаа дээр дарна уу.')])]));
+      var hero=el('div', { class: 'msr-profile-hero' }, el('div', { class: 'hd' }, [avatarWrap, el('div', null, [el('b', { style: 'font-size:20px' }, p.username), el('span', { class: 'msr-bdg' }, S.admin ? 'ADMIN' : 'USER')])]));
+      hero.id='msr-profile-hero';
+      box.appendChild(hero);
+      box.appendChild(el('button',{class:'msr-btn pri',type:'button',style:'margin:10px 0 16px',onclick:function(){var settings=box.querySelector('#msr-profile-settings');if(settings){settings.hidden=false;settings.scrollIntoView({behavior:'smooth',block:'start'});}}},'✎ Edit Profile'));
+      var settings=el('div',{id:'msr-profile-settings',class:'msr-profile-card',hidden:true},[
+        el('h3',{class:'msr-profile-title'},'⚙ Account Settings'),
+        el('dl',null,[el('dt',null,'Имэйл'),el('dd',null,S.user.email),el('dt',null,'Бүртгүүлсэн'),el('dd',null,new Date(S.user.created_at).toLocaleDateString('mn-MN')),el('dt',null,'Username'),el('dd',null,name),el('dt',null,'Профайл зураг'),el('dd',null,'Зураг солихын тулд дээрх харандаа дээр дарна уу.')])
+      ]);
+      settings.appendChild(file);settings.appendChild(save);settings.appendChild(msg);box.appendChild(settings);
       var claimBox = el('div', { style: 'margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:10px' }, el('b', null, 'Standoff 2 ID Verification'));
       box.appendChild(claimBox);
       (async function () {
