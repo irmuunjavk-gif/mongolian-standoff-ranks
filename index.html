@@ -1132,6 +1132,18 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
  header.top .mobile-header-search:focus-within{position:absolute!important;right:16px!important;top:16px!important;width:min(70vw,280px)!important}
 }
 </style>
+
+<style id="msr-results-collapsible-filter">
+.results-filter-toggle{display:none}
+@media(max-width:760px){
+ .results-filter-shell{background:#22252d;border:1px solid #363d49;border-radius:15px;margin-bottom:18px;overflow:hidden}
+ .results-filter-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;padding:15px 18px;background:transparent;border:0;color:#e9edf5;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+ .results-filter-arrow{font-size:26px;line-height:1;transition:transform .2s}
+ .results-filter-toggle[aria-expanded="true"] .results-filter-arrow{transform:rotate(180deg)}
+ .results-filter-shell .flt{margin:0!important;border:0!important;border-radius:0!important}
+ .results-filter-shell .flt.results-filter-collapsed:not(.results-filter-expanded){display:none!important}
+}
+</style>
 </head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
@@ -2316,7 +2328,15 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
     var flt = h('div', { class: 'flt' }, sel('Date', DATEOPT, RF.days, set('days')), sel('Event', EVOPT, RF.ev, set('ev')), sel('Map', MAPOPT, RF.map, set('map')), sel('Team', TEAMOPT, RF.team, set('team')),
       sel('Format', [['all', 'Any format'], ['1', 'Best of 1'], ['3', 'Best of 3']], RF.bo, set('bo')), cnt);
     draw();
-    return h('div', null, pageHead('Results', 'Every finished match, newest first. Filter by date, event, map, team or format.'), goldBanner(), flt, box);
+    var toggle=h('button',{type:'button',class:'results-filter-toggle','aria-expanded':'false','aria-controls':'results-filter-fields'},
+      h('span',null,'Filters'),h('span',{class:'results-filter-arrow','aria-hidden':'true'},'⌄'));
+    flt.id='results-filter-fields';
+    flt.classList.add('results-filter-collapsed');
+    toggle.addEventListener('click',function(){
+      var opened=flt.classList.toggle('results-filter-expanded');
+      toggle.setAttribute('aria-expanded',String(opened));
+    });
+    return h('div', null, pageHead('Results', 'Every finished match, newest first. Filter by date, event, map, team or format.'), goldBanner(), h('div',{class:'results-filter-shell'},toggle,flt), box);
   };
 
   /* ================= Match page ================= */
