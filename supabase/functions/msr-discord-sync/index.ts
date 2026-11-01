@@ -4,14 +4,37 @@ const headers={apikey:service,Authorization:'Bearer '+service,'Content-Type':'ap
 async function db(path:string,init:RequestInit={}){const r=await fetch(base+'/rest/v1/'+path,{...init,headers:{...headers,...init.headers}});if(!r.ok)throw Error('database_'+r.status);const body=await r.text();return body?JSON.parse(body):null;}
 const norm=(s:string)=>s.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
 function parse(content:string){
- const lines=content.replace(/[*_`]/g,'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
- const name=lines.map(s=>s.match(/^(?:clan|team)\s*name\s*[:：-]\s*(.+)$/i)).find(Boolean)?.[1]?.trim();
- const tag=lines.map(s=>s.match(/^(?:clan|team)\s*tag\s*[:：-]\s*(.+)$/i)).find(Boolean)?.[1]?.trim()||'';
+ const lines=content.replace(/[*\x60]/g,'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+ const clean=(s:string)=>s.replace(/^[\s#•\-–—:：『』【】<>👑]+|[\s『』【】]+$/gu,'').trim();
+ const namePattern=/^(?:(?:clan|team)\s*name|name|team|багийн\s*нэр|баг)\s*[:：=-]\s*(.*)$/i;
+ let name='';
+ for(let i=0;i<lines.length;i++){const m=clean(lines[i]).match(namePattern);if(m){name=clean(m[1]||lines[i+1]||'');break;}}
+ if(!name && lines[0] && !/\d{5,}|https?:|captain|roster|main|sub|бүртгэл|registration/i.test(lines[0])) name=clean(lines[0]);
+ const tag=lines.map(s=>clean(s).match(/^(?:(?:clan|team)\s*)?tag\s*[:：=-]\s*(.+)$/i)).find(Boolean)?.[1]?.replace(/[『』\[\]]/g,'').trim()||'';
  if(!name||name.length>100||!norm(name))return null;
+ name=name.replace(/[👑亗乂]/gu,'').replace(/\s*\[[^\]]{1,20}\]\s*$/,'').trim();
  const roster:string[]=[];
- for(const line of lines){
-  const m=line.match(/^(?:\d+[.)]\s*)?(.{1,40}?)\s*[-–—:]\s*\d{5,12}(?:\D|$)/);
-  if(m){const nick=m[1].replace(/^[•\s–—-]+/g,'').replace(/\s*[–—:-]*\s*ID\s*$/i,'').replace(/^(?:\[\s*\]\s*)?(?:team captain|captain|main|sub)\s*[:：–—-]\s*/i,'').trim();if(nick&&!/[A-Z0-9]{10,}$/.test(nick)&&!roster.includes(nick))roster.push(nick);}
+ function nickname(prefix:string){
+  return clean(prefix)
+   .replace(/^(?:\[\s*\]\s*)?(?:(?:team\s*)?captain|main|sub(?:stitute)?s?|player|тоглогч|ахлагч)\s*\d*\s*[:：–—-]?\s*/i,'')
+   .replace(/^(?:【\s*\d+\s*】|S?\d{1,2}\s*】|[([]?\d{1,2}[)\].:-])\s*[×x]?\s*/,'')
+   .split(/\b(?:iphone|ipad|ip\s*\d|ios|honor|redmi|samsung|poco|rog|realme|lenovo|tecno|infinix|red\s*magic)/i)[0]
+   .replace(/^(?:ign)\s*[-:：]?\s*/i,'').replace(/[亗乂]/gu,'').replace(/\s+\d{1,2}\s*(?:pro|max|plus|pm)\b.*$/i,'')
+   .replace(/\b[A-Z0-9]{8,}\b/g,s=>/\d/.test(s)&&/[A-Z]/.test(s)?'':s)
+   .replace(/[\s–—:/~-]*\bID\s*[:：-]?\s*$/i,'')
+   .replace(/[\s–—:/~\-\[\]]+$/g,'').replace(/^[\s–—:/~\-\[\]]+/g,'').trim();
+ }
+ for(let i=0;i<lines.length;i++){
+  const line=lines[i];
+  const match=line.match(/\b\d{5,12}\b/);
+  if(!match)continue;
+  let prefix=line.slice(0,match.index);
+  const brackets=line.match(/\[([^\]]{1,40})\]\s*\[\d{5,12}\]/);
+  if(brackets)prefix=brackets[1];
+  else if(/^\s*(?:[-#•]\s*)?ID\s*[:：-]?\s*$/i.test(prefix)) prefix=lines[i-1]||'';
+  const nick=nickname(prefix);
+  if(!nick||nick.length>40||/https?:|clan|captain|roster|^main$|^sub$|name\s*:/i.test(nick)||/\d{5,}/.test(nick))continue;
+  if(!roster.includes(nick))roster.push(nick);
  }
  if(roster.length<5||roster.length>12)return null;
  return {name,tag:tag.slice(0,30),name_key:norm(name),roster};
@@ -44,7 +67,7 @@ Deno.serve(async(req)=>{
    const msgs=await r.json();if(!Array.isArray(msgs))throw Error('invalid_discord_response');
    for(const m of msgs){
     seen++;const team=parse(m.content||'');if(!team){skipped++;continue;}
-    const prev:any=map.get(team.name_key);
+    const prev:any=map.get(team.name_key)||known.find((x:any)=>x.source_message_id===m.id);
     const timestamp=m.edited_timestamp||m.timestamp;
     if(prev && Date.parse(prev.source_timestamp) >= Date.parse(timestamp)) continue;
     const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(team.name_key)))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
