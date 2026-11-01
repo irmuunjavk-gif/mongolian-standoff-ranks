@@ -46,7 +46,7 @@ Deno.serve(async(req)=>{
     seen++;const team=parse(m.content||'');if(!team){skipped++;continue;}
     const prev:any=map.get(team.name_key);
     const timestamp=m.edited_timestamp||m.timestamp;
-    if(prev&&prev.source_timestamp>=timestamp)continue;
+    if(prev && Date.parse(prev.source_timestamp) >= Date.parse(timestamp)) continue;
     const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(team.name_key)))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
     const id=prev?.id||'ds_'+hash;
     const image=await logo(m.attachments,id).catch(()=>null);
