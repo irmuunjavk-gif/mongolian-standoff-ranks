@@ -1395,8 +1395,22 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       PLAYERS.push({ nick: nick, team: code, maps: 0, kills: 0, deatkd: 0 });
     });
   });
-  PLAYERS.sort(function (a, b) { return b.kd - a.kd; });
-  PLAYERS.forEach(function (p, i) { p.rank = i + 1; });
+  // Map-adjusted KD: low sample sizes are shrunk toward 1.0.
+  // At 10 maps, half of the weight comes from the observed KD.
+  function playerRankScore(p) {
+    var maps = Math.max(0, Number(p.maps) || 0);
+    var kd = Math.max(0, Number(p.kd) || 0);
+    return 1 + (kd - 1) * maps / (maps + 10);
+  }
+  function sortPlayerRanking() {
+    PLAYERS.sort(function (a, b) {
+      return playerRankScore(b) - playerRankScore(a) ||
+        (Number(b.maps) || 0) - (Number(a.maps) || 0) ||
+        (Number(b.kd) || 0) - (Number(a.kd) || 0);
+    });
+    PLAYERS.forEach(function (p, i) { p.rank = i + 1; });
+  }
+  sortPlayerRanking();
 
   /* ================= small builders ================= */
   function crest(code, size) { var t = T[code]; return h('span', { class: 'crest' + (size ? ' ' + size : ''), style: 'background:' + t.c + (t.img ? ' url(' + t.img + ') center/cover no-repeat' : ''), 'aria-hidden': 'true' }, t.img ? '' : t.i); }
@@ -1784,7 +1798,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       chips.appendChild(b);
     });
     draw();
-    return h('div', null, pageHead('Players', PLAYERS.length + ' players, ranked by KD. The top 20 receive gold every 6 months.'), chips, wrap, more);
+    return h('div', null, pageHead('Players', PLAYERS.length + ' players, ranked by map-adjusted KD (more maps = more reliable ranking). The top 20 receive gold every 6 months.'), chips, wrap, more);
   };
 
   V.live = function () {
@@ -2282,8 +2296,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     if (g.n) { p.maps = g.n; p.kills = g.k; p.deaths = g.d; p.kd = +g.kd.toFixed(2); }
     p.rating = g.rating || 0;
   });
-  PLAYERS.sort(function (a, b) { return b.kd - a.kd; });
-  PLAYERS.forEach(function (p, i) { p.rank = i + 1; });
+  sortPlayerRanking();
 
   function vetoOf(m) {
     var rnd = seeded('v' + m.id), maps = m.maps.map(function (x) { return x[0]; }), picks = [], dec;
