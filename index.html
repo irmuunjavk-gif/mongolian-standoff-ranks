@@ -2369,7 +2369,32 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       }
     }
     function set(k) { return function (v) { RF[k] = v; RF.page = 0; draw(); }; }
-    var flt = h('div', { class: 'flt' }, sel('Date', DATEOPT, RF.days, set('days')), sel('Event', EVOPT, RF.ev, set('ev')), sel('Map', MAPOPT, RF.map, set('map')), sel('Team', TEAMOPT, RF.team, set('team')),
+    var flt = h('div', { class: 'flt' }, sel('Date', DATEOPT, RF.days, set('days')), sel('Event', EVOPT, RF.ev, set('ev')), sel('Map', MAPOPT, RF.map, set('map')), (function () {
+      var wrap = h('div', { class: 'f' });
+      var label = h('label', null, 'Team');
+      var search = h('input', { type: 'search', placeholder: 'Search team...', autocomplete: 'off', 'aria-label': 'Search results by team', style: 'width:100%;min-width:0' });
+      var suggestions = h('div', { style: 'max-height:180px;overflow-y:auto;display:none;border:1px solid #384151;border-radius:8px;margin-top:4px' });
+      function options() {
+        suggestions.textContent = '';
+        var q = search.value.trim().toLocaleLowerCase();
+        var opts = TEAMOPT.filter(function (x) { return x[0] !== 'all' && String(x[1]).toLocaleLowerCase().indexOf(q) !== -1; }).slice(0, 25);
+        if (!q) { suggestions.style.display = 'none'; return; }
+        suggestions.style.display = 'block';
+        var all = h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;padding:8px' }, 'All teams');
+        all.addEventListener('click', function () { search.value = ''; suggestions.style.display = 'none'; set('team')('all'); });
+        suggestions.appendChild(all);
+        opts.forEach(function (x) {
+          var btn = h('button', { type: 'button', style: 'display:block;width:100%;text-align:left;padding:8px' }, x[1]);
+          btn.addEventListener('click', function () { search.value = x[1]; suggestions.style.display = 'none'; set('team')(x[0]); });
+          suggestions.appendChild(btn);
+        });
+      }
+      search.addEventListener('input', function () { if (!search.value.trim()) set('team')('all'); options(); });
+      search.addEventListener('focus', options);
+      search.addEventListener('keydown', function (e) { if (e.key === 'Escape') suggestions.style.display = 'none'; });
+      wrap.appendChild(label); wrap.appendChild(search); wrap.appendChild(suggestions);
+      return wrap;
+    })(),
       sel('Format', [['all', 'Any format'], ['1', 'Best of 1'], ['3', 'Best of 3']], RF.bo, set('bo')), cnt);
     draw();
     var toggle=h('button',{type:'button',class:'results-filter-toggle','aria-expanded':'false','aria-controls':'results-filter-fields'},
