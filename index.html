@@ -1166,6 +1166,22 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
 }
 @media(min-width:761px){.results-match-expand{display:none!important}}
 </style>
+<style id="msr-compact-player-cards">
+/* Compact mobile Players ranking cards without affecting player profiles. */
+@media(max-width:760px){
+.pl-grid{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+.pl-grid .plc{padding:10px 12px!important;gap:9px!important;border-radius:10px!important;min-width:0}
+.pl-grid .plc .top{gap:9px!important;min-width:0}
+html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:42px!important;flex:0 0 42px!important}
+.pl-grid .plc .nk{font-size:14px!important;line-height:1.2!important}
+.pl-grid .plc .tm{font-size:11px!important;gap:4px!important}
+.pl-grid .plc .rank{font-size:12px!important}
+.pl-grid .plc .row3{gap:6px!important}
+.pl-grid .plc .s{padding:6px 8px!important;border-radius:7px!important}
+.pl-grid .plc .s .k{font-size:9px!important}
+.pl-grid .plc .s .v{font-size:14px!important;line-height:1.25!important}
+}
+</style>
 </head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
