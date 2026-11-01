@@ -52,9 +52,14 @@
   function drawBar() {
     var box = document.getElementById('msr-auth'); if (!box) return; box.textContent = '';
     if (!barBound) { barBound = true; document.addEventListener('click', function () { var p = document.querySelector('.msr-pop'); if (p) p.remove(); }); }
-    if (!S.user) { box.appendChild(el('button', { class: 'msr-btn', type: 'button', onclick: function () { openModal('login'); } }, 'Log in')); return; }
+    if (!S.user) { box.appendChild(el('button', { class: 'msr-btn', type: 'button', onclick: function () { openModal('login'); } }, 'Log in'));var slot=document.getElementById('mobile-auth-slot');if(slot)slot.replaceChildren(el('button',{class:'msr-btn',type:'button',onclick:function(){openModal('login');}},'Log in'));return; }
     var btn = el('a', { class: 'msr-btn msr-account-link', href: '#profile', 'aria-label': 'Миний профайл' }, [avatar(S.profile), (S.profile && S.profile.username) || 'Профайл']);
     box.appendChild(btn);
+    var menuSlot=document.getElementById('mobile-auth-slot');
+    if(menuSlot){
+      var profile=document.createElement('a');profile.href='#profile';profile.className='msr-menu-avatar-link';profile.setAttribute('aria-label','Open profile');profile.appendChild(avatar(S.profile));
+      menuSlot.replaceChildren(profile);
+    }
   }
 
   /* ---------- login / register modal ---------- */
@@ -323,6 +328,8 @@
 /* Discord-inspired MSR profile, responsive and functional */
 (function(){var style=document.createElement('style');style.textContent=`
 .msr-prof{max-width:780px;margin:auto;padding-bottom:90px}.msr-discord-cover{height:140px;border-radius:20px 20px 0 0;background:radial-gradient(circle at 80% 20%,#3860a0,transparent 50%),linear-gradient(120deg,#101a30,#28345c 60%,#141a28);display:flex;align-items:flex-start;justify-content:flex-end;padding:16px;color:#c7d8fb;font-weight:800;letter-spacing:2px;font-size:11px}.msr-prof .msr-profile-hero{position:relative;margin-top:-42px;border-radius:0 0 20px 20px!important;background:#171c29!important;min-height:145px;box-shadow:none!important}.msr-prof .msr-profile-hero .hd{align-items:flex-end!important;gap:18px!important}.msr-prof .msr-avatar-edit-wrap{margin-top:-25px}.msr-profile-edit-btn{display:block!important;width:100%!important;margin:18px 0 10px!important;padding:14px!important;border-radius:12px!important;background:#5865f2!important;color:#fff!important;font-weight:800!important}.msr-profile-tabs{display:flex;gap:3px;overflow-x:auto;border-bottom:1px solid #354052;margin:14px 0 20px}.msr-profile-tabs button{flex:1;min-width:74px;background:transparent;border:0;color:#aeb5c8;padding:14px 8px;font-weight:800;font-size:14px;border-bottom:3px solid transparent;cursor:pointer}.msr-profile-tabs button.active{color:#9da9ff;border-bottom-color:#7788ff}.msr-profile-panel[hidden]{display:none!important}.msr-profile-promo{border:2px solid #7752df;border-radius:19px;padding:20px;margin:14px 0 18px;background:#24232f}.msr-profile-promo h3{margin:0 0 8px}.msr-profile-promo p{color:#bbc4d5}.msr-profile-promo button{width:100%;margin-top:10px}.msr-profile-stat{background:#1d222d;border-radius:17px;margin:12px 0;padding:19px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.msr-profile-stat span{color:#aeb8c9}.msr-profile-stat strong{font-size:16px}.msr-prof #msr-profile-settings{margin-top:10px}.msr-prof #msr-profile-settings[hidden]{display:none!important}@media(max-width:520px){.msr-discord-cover{height:110px}.msr-prof .msr-profile-hero .hd{flex-wrap:wrap}.msr-profile-tabs button{font-size:12px;min-width:65px}.msr-prof{padding-bottom:110px}}`;document.head.appendChild(style);})();
+
+(function(){var st=document.createElement('style');st.textContent='.msr-menu-avatar-link{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid #6ca9ed;background:#18273b;padding:0!important}.msr-menu-avatar-link .msr-av{width:100%!important;height:100%!important;object-fit:cover;border-radius:50%}.msr-menu-avatar-link span.msr-av{display:flex;align-items:center;justify-content:center}.msr-menu-avatar-link:hover{border-color:#b5c9ff}#mobile-auth-slot{margin:0!important;padding:0!important;border:0!important}';document.head.appendChild(st);})();
   /* ---------- start ---------- */
   window.MSR = { comments: comments, profileView: profileView, openModal: openModal };
   drawBar();
