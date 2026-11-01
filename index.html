@@ -2696,7 +2696,13 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       if (!row || !/^[a-z0-9_]{3,40}$/i.test(row.id) || typeof row.name !== 'string' ||
           !Array.isArray(row.roster) || row.roster.length < 5 || row.roster.length > 12 ||
           row.roster.some(function (n) { return typeof n !== 'string' || !n || n.length > 40; })) return;
-      var code = byName[key(row.name)] || row.id.toUpperCase();
+      var code = byName[key(row.name)];
+      // CioR White is the confirmed roster already stored under COR.
+      if (!code && key(row.name) === 'ciorwhite' && ROSTER.COR) {
+        var shared = row.roster.filter(function (n) { return ROSTER.COR.some(function (old) { return key(old) === key(n); }); }).length;
+        if (shared >= 5) code = 'COR';
+      }
+      code = code || row.id.toUpperCase();
       var existing = !!T[code];
       if (!existing) {
         T[code] = { n: row.name.slice(0,100), i: row.name.slice(0,2).toUpperCase(), tag: row.tag || '', c: '#3B4658', city: 'Mongolia' };
