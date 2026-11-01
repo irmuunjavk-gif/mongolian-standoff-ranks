@@ -12,6 +12,7 @@
     + 'dialog.msr-modal{border:1px solid var(--line,#2A3645);border-radius:14px;background:var(--surface,#161E2A);color:var(--text,#E9EDF3);padding:22px;width:min(400px,92vw)}dialog.msr-modal::backdrop{background:rgba(0,0,0,.65)}.msr-modal h2{margin:0 0 4px;font-size:20px}.msr-modal form{display:flex;flex-direction:column;gap:10px;margin-top:12px}.msr-modal input,.msr-cm textarea{background:var(--bg,#0D121A);color:var(--text,#E9EDF3);border:1px solid var(--line,#2A3645);border-radius:8px;padding:10px 12px;font:inherit;font-size:14px;width:100%;box-sizing:border-box}.msr-modal input:focus,.msr-cm textarea:focus{outline:2px solid var(--tracer,#2FD27B);outline-offset:0}.msr-tabs{display:flex;gap:6px}.msr-tabs button{flex:1}.msr-tabs .on{border-color:var(--tracer,#2FD27B)}.msr-or{text-align:center;color:var(--dim,#5E6F86);font-size:12px;margin:2px 0}.msr-msg{min-height:18px;margin:0;font-size:13px}.msr-msg.bad{color:#FF6B7A}.msr-msg.ok{color:var(--win,#3FB977)}'
     + '.msr-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--raised,#1E2836);border:1px solid var(--line,#2A3645);color:var(--text,#E9EDF3);padding:11px 18px;border-radius:10px;z-index:200;font-size:14px;max-width:90vw}.msr-toast.bad{border-color:#FF6B7A}'
     + '.msr-cm{margin:34px 0 10px}.msr-cm h3{font-size:18px;margin:0 0 14px}.msr-cm textarea{min-height:84px;resize:vertical}.msr-row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:8px;color:var(--dim,#5E6F86);font-size:12px}.msr-c{display:flex;gap:11px;padding:14px 0;border-top:1px solid var(--line-soft,#1F2937)}.msr-c .bd{flex:1;min-width:0}.msr-c .nm{font-weight:700;font-size:14px}.msr-c .tm{color:var(--dim,#5E6F86);font-size:12px;margin-left:8px}.msr-c .tx{margin:4px 0 6px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}.msr-c .ac{display:flex;gap:4px;flex-wrap:wrap}.msr-c .ac .on{color:#FF6B7A}.msr-rep{margin-left:43px;border-left:2px solid var(--line-soft,#1F2937);padding-left:10px}.msr-note{color:var(--muted,#8899AE);font-size:14px}.msr-prof{max-width:640px}.msr-prof .hd{display:flex;gap:18px;align-items:center;margin:14px 0 20px}.msr-prof dl{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;margin:0 0 18px;font-size:14px}.msr-prof dt{color:var(--dim,#5E6F86)}.msr-prof dd{margin:0;overflow-wrap:anywhere}.msr-bdg{font-size:11px;font-weight:800;letter-spacing:.08em;padding:2px 8px;border-radius:6px;background:var(--raised,#1E2836);margin-left:8px}';
+  css += '.msr-account-link{display:inline-flex;align-items:center;gap:9px;text-decoration:none;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.msr-account-link .msr-av{width:28px;height:28px}.msr-prof{width:100%;max-width:740px;margin:0 auto}.msr-prof h1{font-size:clamp(25px,5vw,34px);letter-spacing:-.03em}.msr-prof .msr-profile-hero{background:linear-gradient(135deg,#172c43,#111b2a 65%,#15334a);border:1px solid #30445b;border-radius:18px;padding:20px;margin:15px 0 16px}.msr-prof .msr-profile-hero .hd{margin:0;gap:15px}.msr-prof .msr-profile-hero .msr-av.lg{width:76px;height:76px;border:2px solid #5a87c6}.msr-prof .msr-profile-hero b{font-size:clamp(19px,4.5vw,25px)!important;overflow-wrap:anywhere}.msr-prof .msr-profile-card{background:rgba(14,22,35,.83);border:1px solid #2c3d53;border-radius:16px;padding:18px;margin:12px 0}.msr-prof .msr-profile-card dl{grid-template-columns:minmax(110px,145px) minmax(0,1fr);gap:14px 12px;margin:0}.msr-prof .msr-profile-card dd{min-width:0}.msr-prof .msr-profile-card input[type=text]{width:100%;min-width:0;background:#101b2b;color:#f0f5ff;border:1px solid #40516a;border-radius:9px;padding:10px 12px;box-sizing:border-box;font-size:16px}.msr-prof .msr-profile-card input[type=file]{width:100%;max-width:100%;font-size:13px;color:#b9c9df}.msr-prof .msr-profile-card .msr-profile-title{font-size:16px;font-weight:800;margin:0 0 15px}.msr-prof .msr-profile-logout{width:100%;margin:18px 0 24px;padding:13px;border:1px solid #a84d60;color:#ffb8c5;background:rgba(105,28,48,.18);border-radius:11px;font-weight:700;cursor:pointer}@media(max-width:520px){.msr-prof .msr-profile-hero{padding:15px}.msr-prof .msr-profile-card{padding:14px}.msr-prof .msr-profile-card dl{grid-template-columns:1fr;gap:5px}.msr-prof .msr-profile-card dt:not(:first-child){margin-top:9px}.msr-account-link{max-width:145px;font-size:12px;padding:6px 9px}}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   function el(tag, a, kids) {
@@ -51,11 +52,8 @@
     var box = document.getElementById('msr-auth'); if (!box) return; box.textContent = '';
     if (!barBound) { barBound = true; document.addEventListener('click', function () { var p = document.querySelector('.msr-pop'); if (p) p.remove(); }); }
     if (!S.user) { box.appendChild(el('button', { class: 'msr-btn', type: 'button', onclick: function () { openModal('login'); } }, 'Log in')); return; }
-    var menu = el('div', { class: 'msr-menu' }), btn = el('button', { class: 'msr-btn', type: 'button', 'aria-haspopup': 'true', style: 'display:flex;align-items:center;gap:8px', onclick: function (e) {
-      e.stopPropagation(); var ex = menu.querySelector('.msr-pop'); if (ex) { ex.remove(); return; }
-      menu.appendChild(el('div', { class: 'msr-pop' }, [el('a', { href: '#profile' }, 'Профайл'), el('button', { type: 'button', onclick: function () { sb.auth.signOut().then(function () { toast('Системээс гарлаа.'); if (location.hash === '#profile') location.hash = '#news'; }); } }, 'Гарах')]));
-    } }, [avatar(S.profile), (S.profile && S.profile.username) || 'Профайл']);
-    menu.appendChild(btn); box.appendChild(menu);
+    var btn = el('a', { class: 'msr-btn msr-account-link', href: '#profile', 'aria-label': 'Миний профайл' }, [avatar(S.profile), (S.profile && S.profile.username) || 'Профайл']);
+    box.appendChild(btn);
   }
 
   /* ---------- login / register modal ---------- */
@@ -138,8 +136,8 @@
           await loadUser((await sb.auth.getSession()).data.session); toast('Профайл хадгалагдлаа.');
         } catch (x) { say(err(x), true); } finally { save.disabled = false; }
       } }, 'Хадгалах');
-      box.appendChild(el('div', { class: 'hd' }, [avatar(p, 'lg'), el('div', null, [el('b', { style: 'font-size:20px' }, p.username), el('span', { class: 'msr-bdg' }, S.admin ? 'ADMIN' : 'USER')])]));
-      box.appendChild(el('dl', null, [el('dt', null, 'Имэйл'), el('dd', null, S.user.email), el('dt', null, 'Бүртгүүлсэн'), el('dd', null, new Date(S.user.created_at).toLocaleDateString('mn-MN')), el('dt', null, 'Username'), el('dd', null, name), el('dt', null, 'Профайл зураг'), el('dd', null, file)]));
+      box.appendChild(el('div', { class: 'msr-profile-hero' }, el('div', { class: 'hd' }, [avatar(p, 'lg'), el('div', null, [el('b', { style: 'font-size:20px' }, p.username), el('span', { class: 'msr-bdg' }, S.admin ? 'ADMIN' : 'USER')])])));
+      box.appendChild(el('div', { class: 'msr-profile-card' }, [el('h3', { class: 'msr-profile-title' }, 'Аккаунтын мэдээлэл'), el('dl', null, [el('dt', null, 'Имэйл'), el('dd', null, S.user.email), el('dt', null, 'Бүртгүүлсэн'), el('dd', null, new Date(S.user.created_at).toLocaleDateString('mn-MN')), el('dt', null, 'Username'), el('dd', null, name), el('dt', null, 'Профайл зураг'), el('dd', null, file)])]));
       var claimBox = el('div', { style: 'margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:10px' }, el('b', null, 'Standoff 2 ID Verification'));
       box.appendChild(claimBox);
       (async function () {
@@ -183,7 +181,7 @@
         });
         adminBox.appendChild(reload); adminBox.appendChild(items); box.appendChild(adminBox);
       }
-      box.appendChild(save); box.appendChild(msg);
+      box.appendChild(save); box.appendChild(msg); box.appendChild(el('button', { class: 'msr-profile-logout', type: 'button', onclick: async function () { var result = await sb.auth.signOut(); if (result.error) return toast(err(result.error), true); location.hash = '#news'; toast('Аккаунтаас гарлаа.'); } }, '↪ Аккаунтаас гарах'));
     }
     document.addEventListener('msr:auth', draw); draw(); return box;
   }
