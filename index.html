@@ -1144,6 +1144,16 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
  .results-filter-shell .flt.results-filter-collapsed:not(.results-filter-expanded){display:none!important}
 }
 </style>
+
+<style id="msr-results-show-three">
+@media(max-width:760px){
+ .results-match-collapsed:not(.results-match-expanded) .results-extra-match{display:none!important}
+ .results-match-expand{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px 14px;margin:-1px 0 17px;background:#222833;border:1px solid #3c4859;border-radius:0 0 12px 12px;color:#e7edf7;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+ .results-match-chevron{font-size:24px;line-height:16px;transition:transform .2s}
+ .results-match-expand[aria-expanded="true"] .results-match-chevron{transform:rotate(180deg)}
+}
+@media(min-width:761px){.results-match-expand{display:none!important}}
+</style>
 </head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
@@ -2316,7 +2326,22 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       var pages = Math.max(1, Math.ceil(list.length / PAGE)); RF.page = Math.min(RF.page, pages - 1);
       var from = RF.page * PAGE, part = list.slice(from, from + PAGE);
       cnt.textContent = list.length ? 'Showing ' + (from + 1) + '–' + (from + part.length) + ' of ' + list.length + ' results' : '0 results';
-      byDate(part).forEach(function (g) { box.appendChild(h('div', { class: 'grp-h' }, g[0])); box.appendChild(h('div', { class: 'box' }, g[1].map(matchRow))); });
+      byDate(part).forEach(function (g) {
+        var matches=g[1], heading=h('div',{class:'grp-h'},g[0]), rows=h('div',{class:'box results-match-group'});
+        matches.forEach(function(m,i){var row=matchRow(m);if(i>=3)row.classList.add('results-extra-match');rows.appendChild(row);});
+        box.appendChild(heading);box.appendChild(rows);
+        if(matches.length>3){
+          rows.classList.add('results-match-collapsed');
+          var expand=h('button',{type:'button',class:'results-match-expand','aria-expanded':'false'},
+            h('span',null,'Show '+(matches.length-3)+' more matches'),h('span',{class:'results-match-chevron','aria-hidden':'true'},'⌄'));
+          expand.addEventListener('click',function(){
+            var opened=rows.classList.toggle('results-match-expanded');
+            expand.setAttribute('aria-expanded',String(opened));
+            expand.firstChild.textContent=opened?'Show less':'Show '+(matches.length-3)+' more matches';
+          });
+          box.appendChild(expand);
+        }
+      });
       if (!list.length) box.appendChild(h('div', { class: 'empty' }, 'No results match these filters.'));
       if (pages > 1) {
         var prev = h('button', { type: 'button', class: 'pbtn', disabled: RF.page === 0 ? 'disabled' : null }, '← Newer'), next = h('button', { type: 'button', class: 'pbtn', disabled: RF.page >= pages - 1 ? 'disabled' : null }, 'Older →');
