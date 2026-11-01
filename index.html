@@ -1202,6 +1202,9 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
 .msr-post-feed{max-width:760px;margin:16px auto 85px;padding:0 10px}.msr-about-post{border:1px solid #35465b;border-radius:16px;overflow:hidden;background:#192330;color:#edf3fc;box-shadow:0 12px 35px #0004}.msr-post-author{display:flex;gap:12px;align-items:center;padding:18px 20px 12px}.msr-post-avatar{display:grid;place-items:center;flex:none;width:52px;height:52px;border-radius:50%;border:2px solid #528de0;background:linear-gradient(145deg,#122e4a,#070f1d);font-size:17px;letter-spacing:-1px;font-weight:950;color:#f5faff;text-shadow:0 0 14px #67b9ff}.msr-post-author-text{display:flex;flex-direction:column;gap:4px;min-width:0}.msr-post-author-text strong{font-size:16px;color:#f5f7fb}.msr-post-author-text span{font-size:12px;color:#9eafc3}.msr-post-copy{padding:7px 20px 17px;font-size:15px;line-height:1.75;color:#d6e0ed}.msr-post-copy h1{font-size:clamp(20px,4.5vw,27px);line-height:1.3;color:#fff;margin:7px 0 15px}.msr-post-copy p{margin:0 0 14px}.msr-post-ending{font-weight:800;color:#8fc4ff!important;margin-bottom:0!important}.msr-post-art{position:relative;min-height:345px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:25px;background:radial-gradient(circle at 50% 48%,#235c81 0,#102e4d 33%,#09172b 65%,#050b17 100%);isolation:isolate}.msr-post-art:before{content:'';position:absolute;inset:-45%;z-index:-1;background:repeating-conic-gradient(from 15deg,#6ab4f10a 0 7deg,transparent 7deg 25deg);transform:rotate(-12deg)}.msr-post-art:after{content:'';position:absolute;inset:14px;border:1px solid #79caff30;pointer-events:none}.msr-post-art-ring{display:flex;flex-direction:column;align-items:center;gap:8px;padding:30px 20px;border:2px solid #66b9ed55;box-shadow:0 0 65px #2795db33,inset 0 0 45px #278ec21a;transform:skew(-4deg);background:#091b2d66}.msr-post-art-logo{font-size:clamp(74px,17vw,132px);line-height:1;letter-spacing:-.11em;padding-right:.11em;font-weight:1000;font-style:italic;color:#f5fbff;text-shadow:0 6px 0 #1a6c9b,0 12px 22px #000b,0 0 35px #50b7ef}.msr-post-art-sub{font-size:clamp(10px,2.5vw,16px);letter-spacing:3px;font-weight:900;color:#9bdaff;text-align:center}.msr-post-art-tagline{font-size:10px;letter-spacing:2px;text-align:center;font-weight:800;color:#b7d4e9;padding:0 15px}@media(max-width:540px){.msr-post-feed{padding:0;margin-top:7px}.msr-about-post{border-radius:13px}.msr-post-author{padding:14px 15px 10px}.msr-post-copy{padding:5px 15px 15px;font-size:14px}.msr-post-art{min-height:275px}.msr-post-art-ring{padding:24px 15px}.msr-post-art-sub{letter-spacing:1.4px}}
 </style>
 <style id="msr-demo-yellow-highlight">.brand .msr-demo-mark{color:#191500!important;background:#ffdf47!important;border:1px solid #f6c52c!important;opacity:1!important;font-weight:950!important;box-shadow:0 0 9px #ffd43b66;letter-spacing:.04em!important}@media(max-width:760px){.brand .msr-demo-mark{font-size:8px!important;padding:3px 4px!important}}</style>
+<style id="msr-match-outcomes-style">
+.mpc.msr-map-simple .rh,.mpc.msr-map-simple .hv{display:none!important}.msr-map-simple .msr-map-score{display:flex;align-items:center;justify-content:center;gap:13px;font-size:clamp(34px,7vw,54px);font-weight:950;line-height:1.25;letter-spacing:-1px;margin:10px auto 16px;text-shadow:0 3px 14px #000a}.msr-map-score .w{color:#71dba0}.msr-map-score .l{color:#f38c8c}.msr-score-colon{color:#eaf2ff}.msr-outcome{display:inline-block!important;width:max-content;font-size:11px!important;font-weight:950!important;letter-spacing:.09em;padding:5px 10px;border-radius:6px;margin:5px auto;text-transform:uppercase}.msr-outcome-win{color:#7df4a6!important;background:#0f4932!important;border:1px solid #2ebc73}.msr-outcome-loss{color:#ff8e96!important;background:#4b1d28!important;border:1px solid #d95468}.msr-outcome-auto{color:#ffbd7e!important;background:#49301c!important;border:1px solid #ce8d43}.mh .mt .msr-outcome{display:block!important}
+</style>
 </head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
@@ -2502,17 +2505,31 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
   };
 
   /* ================= Match page ================= */
+  function msrMatchOutcome(m) {
+    var score = series(m), done = m.state === 'done';
+    var note = [m.result_type,m.resultType,m.outcome,m.reason,m.status,m.st].filter(Boolean).join(' ').toLowerCase();
+    var auto = /\\b(auto|walkover|w\\/?o|forfeit|no.show)\\b/i.test(note) || m.auto === true || m.walkover === true;
+    var winner = score[0] > score[1] ? 'a' : score[1] > score[0] ? 'b' : null;
+    if (m.winner === m.a || m.winner === 'a') winner = 'a';
+    if (m.winner === m.b || m.winner === 'b') winner = 'b';
+    return { done: done, winner: winner, auto: done && auto };
+  }
+  function msrOutcomeBadge(m, side) {
+    var o = msrMatchOutcome(m);
+    if (!o.done || !o.winner) return null;
+    var won = o.winner === side;
+    return h('span', { class: 'msr-outcome ' + (won ? 'msr-outcome-win' : o.auto ? 'msr-outcome-auto' : 'msr-outcome-loss') },
+      won ? (o.auto ? 'WIN A' : 'WIN') : (o.auto ? 'AUTO' : (m.eliminated === (side === 'a' ? m.a : m.b) || m.eliminatedTeam === (side === 'a' ? m.a : m.b) || m.isElimination === true || m.elimination === true ? 'ELIMINATED' : 'L')));
+  }
   function mapCard(m, i) {
     var x = m.maps[i], d = detail(m, i), art = MAPART[x[0]], st = x[3];
     var left = h('div', { class: 'mi' }, h('b', null, x[0]), h('span', null, x[4] + (st === 'live' ? ' · live' : '')));
     if (!d) return h('div', { class: 'mpc nodata', style: '--mi:' + art }, left, h('div', { class: 'msb' }, h('span', { class: 'sc0' }, 'Not played')));
-    var ct = d.aCT ? ['ct', 't'] : ['t', 'ct'];
-    var hv = h('span', { class: 'hv' }, '(', h('i', { class: ct[0] }, d.a1), ':', h('i', { class: ct[1] }, d.b1), ') (', h('i', { class: ct[1] }, d.a2), ':', h('i', { class: ct[0] }, d.b2), ')');
-    var rh = h('div', { class: 'rh' }, ['A', 'B'].map(function (side) {
-      return h('div', { class: 'rr' }, d.hist.map(function (w, k) { return h('i', { class: (w === side ? 'on ' + side : '') + (k === 12 ? ' gap' : '') }); }));
-    }));
-    return h('div', { class: 'mpc', style: '--mi:' + art }, left,
-      h('div', { class: 'msb' }, h('span', { class: x[1] > x[2] ? 'w' : 'l' }, x[1]), h('span', null, ':'), h('span', { class: x[2] > x[1] ? 'w' : 'l' }, x[2])), hv, rh);
+    var score = h('div', { class: 'msr-map-score' },
+      h('span', { class: x[1] > x[2] ? 'w' : 'l' }, x[1]),
+      h('span', { class: 'msr-score-colon' }, ':'),
+      h('span', { class: x[2] > x[1] ? 'w' : 'l' }, x[2]));
+    return h('div', { class: 'mpc msr-map-simple', style: '--mi:' + art }, left, score);
   }
   function mapRows(m, idx) {
     var out = {}, picks = idx === 'all' ? m.maps.map(function (x, i) { return i; }) : [idx];
@@ -2540,11 +2557,11 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     var s = series(m), live = m.state === 'live', soon = m.state === 'soon', done = m.state === 'done';
     var when = soon ? m.day + ' · ' + m.when : live ? 'Started today' : dlabel(m.date) + ', 2026';
     var head = h('div', { class: 'mh' },
-      h('a', { class: 'mt', href: teamHref(m.a) }, crest(m.a, 'xl'), h('b', null, T[m.a].n), h('span', null, '#' + rankOf(m.a) + ' in ranking')),
+      h('a', { class: 'mt', href: teamHref(m.a) }, crest(m.a, 'xl'), h('b', null, T[m.a].n), msrOutcomeBadge(m, 'a'), h('span', null, '#' + rankOf(m.a) + ' in ranking')),
       h('div', { class: 'mc' }, h('div', { class: 'mst' + (live ? ' live' : '') }, live ? 'LIVE' : soon ? 'UPCOMING' : 'FINISHED'),
         h('div', { class: 'msc' }, soon ? h('span', { class: 'vs' }, 'VS') : [h('span', { class: done ? (s[0] > s[1] ? 'w' : 'l') : '' }, s[0]), h('span', { class: 'cl' }, ':'), h('span', { class: done ? (s[1] > s[0] ? 'w' : 'l') : '' }, s[1])]),
         h('div', { class: 'mdt' }, when)),
-      h('a', { class: 'mt', href: teamHref(m.b) }, crest(m.b, 'xl'), h('b', null, T[m.b].n), h('span', null, '#' + rankOf(m.b) + ' in ranking')));
+      h('a', { class: 'mt', href: teamHref(m.b) }, crest(m.b, 'xl'), h('b', null, T[m.b].n), msrOutcomeBadge(m, 'b'), h('span', null, '#' + rankOf(m.b) + ' in ranking')));
     var info = h('div', { class: 'mi2' }, h('a', { href: '#events' }, h('b', null, m.ev)), h('span', null, m.st), h('span', null, 'Best of ' + m.bo),
       live ? h('a', { class: 'btn', href: '#live', svg: ICON.play + '<span>Watch live</span>' }) : null);
 
