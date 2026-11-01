@@ -2508,7 +2508,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
   function msrMatchOutcome(m) {
     var score = series(m), done = m.state === 'done';
     var note = [m.result_type,m.resultType,m.outcome,m.reason,m.status,m.st].filter(Boolean).join(' ').toLowerCase();
-    var auto = /\\b(auto|walkover|w\\/?o|forfeit|no.show)\\b/i.test(note) || m.auto === true || m.walkover === true;
+    var auto = /auto|walkover|forfeit|no.show|w.o/i.test(note) || m.auto === true || m.walkover === true;
     var winner = score[0] > score[1] ? 'a' : score[1] > score[0] ? 'b' : null;
     if (m.winner === m.a || m.winner === 'a') winner = 'a';
     if (m.winner === m.b || m.winner === 'b') winner = 'b';
