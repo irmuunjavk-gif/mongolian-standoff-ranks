@@ -2686,6 +2686,51 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
     document.getElementById('tip').classList.remove('on');
     [].slice.call(app.querySelectorAll('table.t')).forEach(function (tb) { var th = tb.querySelector('th'); if (th && th.textContent.trim() === '#') tb.classList.add('rk'); });
   }
+
+  /* Confirmed Discord registrations: reuse existing ranking UI and team records. */
+  function mergeDiscordTeams(rows) {
+    function key(s) { return String(s || '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, ''); }
+    var byName = {};
+    Object.keys(T).forEach(function (code) { byName[key(T[code].n)] = code; });
+    rows.forEach(function (row) {
+      if (!row || !/^[a-z0-9_]{3,40}$/i.test(row.id) || typeof row.name !== 'string' ||
+          !Array.isArray(row.roster) || row.roster.length < 5 || row.roster.length > 12 ||
+          row.roster.some(function (n) { return typeof n !== 'string' || !n || n.length > 40; })) return;
+      var code = byName[key(row.name)] || row.id.toUpperCase();
+      var existing = !!T[code];
+      if (!existing) {
+        T[code] = { n: row.name.slice(0,100), i: row.name.slice(0,2).toUpperCase(), tag: row.tag || '', c: '#3B4658', city: 'Mongolia' };
+        RANK.push([code, Number.isFinite(row.points) ? row.points : 50, 0, 0, 0, '']);
+        byName[key(row.name)] = code;
+      }
+      if (!existing && typeof row.logo_url === 'string' && /^https:\/\/gqepygqtgosvpfirahgd\.supabase\.co\/storage\/v1\/object\/public\/team-logos\/[a-z0-9_.-]+$/.test(row.logo_url)) T[code].img = row.logo_url;
+      if (existing) return;
+      ROSTER[code] = row.roster.slice();
+      row.roster.forEach(function (nick) {
+        if (PLAYERS.some(function (p) { return p.nick === nick && p.team === code; })) return;
+        var p = { nick: nick, team: code, maps: 0, kills: 0, deaths: 0, kd: 0, rating: 0, rank: PLAYERS.length + 1, skill: 1, hs0: 0 };
+        PLAYERS.push(p);
+        if (!PBY[nick]) PBY[nick] = p;
+      });
+    });
+    RANK.sort(function (a,b) { return b[1]-a[1]; });
+  }
+  async function loadDiscordTeams() {
+    var cfg = window.MSR_CONFIG;
+    if (!cfg || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return;
+    try {
+      var response = await fetch(cfg.SUPABASE_URL + '/rest/v1/msr_discord_teams?select=id,name,tag,roster,logo_url,points&order=name', {
+        headers: { apikey: cfg.SUPABASE_ANON_KEY }, signal: AbortSignal.timeout(10000)
+      });
+      if (!response.ok) return;
+      var rows = await response.json();
+      if (!Array.isArray(rows)) return;
+      mergeDiscordTeams(rows);
+      if (/^(ranking|team|players|player)(\/|$)/.test(H)) route();
+    } catch (e) { /* Keep the original teams available if the service is offline. */ }
+  }
+  document.addEventListener('DOMContentLoaded', loadDiscordTeams);
+
   function route() {
     var raw = H || 'news', parts = raw.split('/'), name = parts[0], arg = decodeURIComponent(parts[1] || '');
     if (!V[name] || name === 'search') name = 'news';
