@@ -1693,7 +1693,23 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     });
   })();
   V.news = function () {
+    var guide = NEWS.filter(function(n){return n.id==='msr-login-guide'})[0];
     return h('div', { class: 'msr-post-feed' },
+      guide ? h('article', { class:'msr-about-post' },
+        h('header', { class:'msr-post-author' },
+          h('div', { class:'msr-post-avatar', 'aria-hidden':'true' }, 'MSR'),
+          h('div', { class:'msr-post-author-text' },
+            h('strong', null, 'Mongolian Standoff Ranks'),
+            h('span', null, 'Official guide · '+guide.t)
+          )
+        ),
+        h('div', { class:'msr-post-copy' },
+          h('h1', null, guide.h),
+          h('p', null, guide.lead),
+          guide.body.map(function(p){return h('p', null, p)}),
+          h('a', { href:'#article/msr-login-guide', class:'msr-shop-contact', style:'display:inline-block;margin-top:12px' }, 'Мэдээг нээж сэтгэгдэл үлдээх →')
+        )
+      ) : null,
       h('article', { class: 'msr-about-post' },
         h('header', { class: 'msr-post-author' },
           h('div', { class: 'msr-post-avatar', 'aria-hidden': 'true' }, 'MSR'),
