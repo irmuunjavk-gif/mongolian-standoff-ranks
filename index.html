@@ -1356,6 +1356,11 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   function go(hash) { return function () { navTo(hash.replace(/^#/, '')); }; }
   function tagEl(code) { var t = T[code]; return t && t.tag ? h('span', { class: 'ctag' }, '[' + t.tag + ']') : null; }
   function teamHref(code) { return '#team/' + code; }
+  var GAME_IDS = {};
+  function gameIdEl(nick, team) {
+    var id = GAME_IDS[team + '|' + String(nick).normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '')];
+    return id ? h('small', { class: 'game-id', style: 'display:block;font-size:12px;color:var(--muted);font-weight:500;line-height:1.7' }, 'ID: ' + id) : null;
+  }
   function playerHref(nick) { return '#player/' + encodeURIComponent(nick); }
   function tc(p) { return p && p.team && T[p.team] && T[p.team].img ? ' t-' + p.team : ''; }
   (function () {
@@ -1706,7 +1711,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       PLAYERS.filter(function (p) { return filter === 'all' || p.team === filter; }).forEach(function (p) {
         wrap.appendChild(h('a', { class: 'plc', href: playerHref(p.nick) },
           h('div', { class: 'top' }, h('span', { class: 'av sg' + tc(p), title: p.nick }, sig(p.nick, 54)),
-            h('div', null, h('div', { class: 'nk' }, tagEl(p.team), p.nick), h('div', { class: 'tm' }, crest(p.team), T[p.team].n)),
+            h('div', null, h('div', { class: 'nk' }, tagEl(p.team), p.nick), gameIdEl(p.nick, p.team), h('div', { class: 'tm' }, crest(p.team), T[p.team].n)),
             h('span', { class: 'rank' }, '#' + p.rank)),
           h('div', { class: 'row3' },
             h('div', { class: 's kd' }, h('div', { class: 'k' }, 'KD'), h('div', { class: 'v' }, p.kd.toFixed(2))),
@@ -2522,7 +2527,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       h('tbody', null, roster.map(function (p) {
         var g = agg(PROWS[p.nick] || []);
         return h('tr', { class: 'clk', onclick: go(playerHref(p.nick)) }, h('td', null, h('div', { class: 'tcell' }, h('span', { class: 'bigav sg' + tc(p), style: 'width:30px;height:30px', 'aria-hidden': 'true' }, sig(p.nick, 30)),
-          h('div', null, h('a', { class: 'tl', href: playerHref(p.nick) }, h('b', null, p.nick)), h('span', { class: 's' }, 'League #' + p.rank)))),
+          h('div', null, h('a', { class: 'tl', href: playerHref(p.nick) }, h('b', null, p.nick)), gameIdEl(p.nick, p.team), h('span', { class: 's' }, 'League #' + p.rank)))),
           h('td', { class: 'n' }, p.maps), h('td', { class: 'n' }, p.kd.toFixed(2)), h('td', { class: 'n' }, g.adr.toFixed(1)), h('td', { class: 'n' }, g.kast.toFixed(1) + '%'), h('td', { class: 'n' }, rt(p.rating)));
       }))));
 
@@ -2606,7 +2611,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       h('a', { class: 'back', href: '#players', svg: ICON.back + '<span>Players</span>' }),
       h('div', { class: 'hl-head' },
         h('div', { class: 'hl-card' },
-          h('div', { class: 'hl-top' }, h('span', { class: 'bigav sg hl' + tc(p), 'aria-hidden': 'true' }, sig(p.nick, 120)), h('h1', null, tagEl(team), p.nick)),
+          h('div', { class: 'hl-top' }, h('span', { class: 'bigav sg hl' + tc(p), 'aria-hidden': 'true' }, sig(p.nick, 120)), h('h1', null, tagEl(team), p.nick), gameIdEl(p.nick, team)),
           h('ul', { class: 'hl-list' }, li('Team', h('a', { class: 'tl', href: teamHref(team) }, crest(team), h('b', null, T[team].n))), li('Country', 'Mongolia'), li('Rating rank', '#' + rrank + ' of ' + PLAYERS.length))),
         statCard),
       flt, host);
@@ -2635,7 +2640,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   function rankApp() {
     var open = APR.open, cards = [];
     var dt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    function plAv(nick, code) { var avatar=h('span', { class: 'bigav sg' + tc({ team: code }), 'aria-hidden': 'true' }, sig(nick, 64)); var team=T[code]; if(team && team.img){ avatar.style.backgroundImage='radial-gradient(circle,rgba(8,8,12,.58) 0%,rgba(8,8,12,.82) 100%),url("'+String(team.img).replace(/"/g,'')+'")'; avatar.style.backgroundPosition='center'; avatar.style.backgroundSize='cover'; } return h('a', { class: 'ap-pl', href: playerHref(nick) }, avatar, h('span', { class: 'n' }, nick)); }
+    function plAv(nick, code) { var avatar=h('span', { class: 'bigav sg' + tc({ team: code }), 'aria-hidden': 'true' }, sig(nick, 64)); var team=T[code]; if(team && team.img){ avatar.style.backgroundImage='radial-gradient(circle,rgba(8,8,12,.58) 0%,rgba(8,8,12,.82) 100%),url("'+String(team.img).replace(/"/g,'')+'")'; avatar.style.backgroundPosition='center'; avatar.style.backgroundSize='cover'; } return h('a', { class: 'ap-pl', href: playerHref(nick) }, avatar, h('span', { class: 'n' }, nick), gameIdEl(nick, code)); }
     function setOpen(i) {
       open = open === i ? -1 : i; APR.open = open;
       cards.forEach(function (c, k) { var on = k === open; c.el.classList.toggle('open', on); c.btn.setAttribute('aria-expanded', on ? 'true' : 'false'); });
@@ -2791,6 +2796,10 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
         byName[key(row.name)] = code;
       }
       if (!existing && typeof row.logo_url === 'string' && /^https:\/\/gqepygqtgosvpfirahgd\.supabase\.co\/storage\/v1\/object\/public\/team-logos\/[a-z0-9_.-]+$/.test(row.logo_url)) T[code].img = row.logo_url;
+      Object.keys(row.player_ids || {}).forEach(function(nick) {
+        var id = String(row.player_ids[nick]);
+        if (/^\d{5,12}$/.test(id)) GAME_IDS[code + '|' + key(nick)] = id;
+      });
       if (existing) return;
       ROSTER[code] = row.roster.slice();
       row.roster.forEach(function (nick) {
@@ -2806,7 +2815,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
     var cfg = window.MSR_CONFIG;
     if (!cfg || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return;
     try {
-      var response = await fetch(cfg.SUPABASE_URL + '/rest/v1/msr_discord_teams?select=id,name,tag,roster,logo_url,points&order=name', {
+      var response = await fetch(cfg.SUPABASE_URL + '/rest/v1/msr_discord_teams?select=id,name,tag,roster,logo_url,points,player_ids&order=name', {
         headers: { apikey: cfg.SUPABASE_ANON_KEY }, signal: AbortSignal.timeout(10000)
       });
       if (!response.ok) return;
