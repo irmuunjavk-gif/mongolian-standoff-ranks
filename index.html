@@ -3277,6 +3277,14 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       dock.querySelectorAll('a').forEach(function(a) { var on = a.dataset.r === page; a.classList.toggle('on', on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     }
     updateDock(); window.addEventListener('hashchange', updateDock);
+    window.addEventListener('popstate', updateDock);
+    document.addEventListener('click',function(e){
+      var link=e.target.closest('a[href^="#"]');if(!link)return;
+      setTimeout(updateDock,0);
+    });
+    var appRoot=document.getElementById('app');
+    if(appRoot)new MutationObserver(function(){updateDock()}).observe(appRoot,{childList:true});
+
     function setMenu(o) { hd.classList.toggle('open', o); document.body.classList.toggle('msr-menu-open', o); bg.setAttribute('aria-expanded', String(o)); }
     bg.addEventListener('click', function () { setMenu(!hd.classList.contains('open')); });
     document.addEventListener('pointerdown',function(e){
