@@ -2717,7 +2717,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   function rankApp() {
     var open = APR.open, cards = [];
     var dt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    function plAv(nick, code) { var avatar=h('span', { class: 'bigav sg' + tc({ team: code }), 'aria-hidden': 'true' }, sig(nick, 64)); var team=T[code]; if(team && team.img){ avatar.style.backgroundImage='radial-gradient(circle,rgba(8,8,12,.58) 0%,rgba(8,8,12,.82) 100%),url("'+String(team.img).replace(/"/g,'')+'")'; avatar.style.backgroundPosition='center'; avatar.style.backgroundSize='cover'; } return h('a', { class: 'ap-pl', href: playerHref(nick) }, avatar, h('span', { class: 'n' }, nick), gameIdEl(nick, code)); }
+    function plAv(nick, code) { var avatar=h('span', { class: 'bigav sg' + tc({ team: code }), 'aria-hidden': 'true' }, sig(nick, 64)); var team=T[code]; if(team && team.img){ avatar.style.backgroundImage='radial-gradient(circle,rgba(8,8,12,.58) 0%,rgba(8,8,12,.82) 100%),url("'+String(team.img).replace(/"/g,'')+'")'; avatar.style.backgroundPosition='center'; avatar.style.backgroundSize='cover'; } return h('a', { class: 'ap-pl', href: playerHref(nick) }, avatar, h('span', { class: 'n' }, nick)); }
     function setOpen(i) {
       open = open === i ? -1 : i; APR.open = open;
       cards.forEach(function (c, k) { var on = k === open; c.el.classList.toggle('open', on); c.btn.setAttribute('aria-expanded', on ? 'true' : 'false'); });
