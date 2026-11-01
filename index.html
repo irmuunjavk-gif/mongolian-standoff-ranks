@@ -1096,6 +1096,19 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
 }
 </style>
 </style>
+
+<style id="mobile-menu-final-layout">
+@media(max-width:760px){
+ #mmenu{display:none!important}
+ body.msr-menu-open #mmenu{display:flex!important;position:fixed!important;top:auto!important;bottom:calc(94px + env(safe-area-inset-bottom))!important;left:4%!important;right:4%!important;width:auto!important;max-height:min(62dvh,490px)!important;overflow-y:auto!important;overscroll-behavior:contain;z-index:300!important;flex-direction:column!important;gap:0!important;padding:12px 15px 16px!important;border:1px solid #364557!important;border-radius:22px!important;background:#1c242e!important;box-shadow:0 12px 45px #000b!important}
+ #mmenu .search.mq{display:block!important;flex:none!important;width:100%!important;margin:0 0 8px!important;grid-column:auto!important}
+ #mmenu .search.mq input{width:100%;height:44px;padding:10px 13px;font-size:14px;border-radius:10px}
+ #mmenu>a{display:block!important;flex:none!important;font-size:15px!important;font-weight:600!important;min-height:42px!important;padding:11px 8px!important;margin:0!important;border:0!important;border-bottom:1px solid #ffffff16!important;border-radius:0!important;background:transparent!important}
+ #mmenu #mobile-auth-slot{flex:none!important;padding-top:8px}
+ #mmenu #mobile-auth-slot .msr-btn{min-height:42px!important;font-size:14px!important}
+}
+@media(min-width:761px){#mmenu{display:none!important}}
+</style>
 </head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
@@ -1125,8 +1138,9 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
     <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mmenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
   </div>
 
-  <nav class="main mob" id="mmenu" aria-label="Mobile menu">
-    <div class="search mq" hidden><input type="search" id="mq" aria-label="Search"></div>
+  </header>
+<nav class="main mob" id="mmenu" aria-label="Mobile menu">
+    <div class="search mq"><input type="search" id="mq" placeholder="Search players, teams, events..." aria-label="Search"></div>
     <a href="#players" data-r="players">Player Rank</a>
     <a href="#ranking" data-r="ranking">Team Ranking</a>
     <a href="#live" data-r="live">Live</a>
@@ -1134,7 +1148,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
     <a href="#stats" data-r="stats">Stats</a>
     <a href="#gold" data-r="gold">Gold</a>
     <div id="mobile-auth-slot"></div>
-  </nav></header>
+  </nav>>
 <nav class="mobile-dock" aria-label="Quick navigation"><div class="dock-tabs"><a href="#matches" data-r="matches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M8 3v4M16 3v4"/></svg><span>Matches</span></a><a href="#news" data-r="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg><span>News</span></a><a href="#events" data-r="events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v6a4 4 0 0 1-8 0zM8 5H4v3a4 4 0 0 0 4 4M16 5h4v3a4 4 0 0 1-4 4M12 13v5M8 21h8M9 18h6"/></svg><span>Events</span></a></div><div id="mobile-burger-slot"></div></nav>
 
 <div class="shell">
@@ -2847,7 +2861,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       dock.querySelectorAll('a').forEach(function(a) { var on = a.dataset.r === page; a.classList.toggle('on', on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     }
     updateDock(); window.addEventListener('hashchange', updateDock);
-    function setMenu(o) { hd.classList.toggle('open', o); bg.setAttribute('aria-expanded', String(o)); }
+    function setMenu(o) { hd.classList.toggle('open', o); document.body.classList.toggle('msr-menu-open', o); bg.setAttribute('aria-expanded', String(o)); }
     bg.addEventListener('click', function () { setMenu(!hd.classList.contains('open')); });
     document.getElementById('mmenu').addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
     window.addEventListener('hashchange', function () { setMenu(false); mq.value = ''; });
