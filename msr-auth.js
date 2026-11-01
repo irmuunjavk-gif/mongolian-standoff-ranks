@@ -114,7 +114,7 @@
         save.disabled = true; say('');
         try {
           var patch = {}, nv = name.value.trim();
-          if (nv !== p.username) { if (!UNAME.test(nv)) return say('Username 3–20 тэмдэгт, зөвхөн латин үсэг, тоо, _ байна.', true); var a = await sb.rpc('username_available', { name: nv }); if (!a.data && nv.toLowerCase() !== p.username.toLowerCase()) return say('Энэ username авагдсан байна.', true); patch.username = nv; }
+          if (nv !== p.username) { if (!UNAME.test(nv)) return say('Username 3–20 тэмдэгт, зөвхөн латин үсэг, тоо, _ байна.', true); var a = await sb.rpc('username_available', { name: nv }); if (a.error) throw a.error; if (!a.data && nv.toLowerCase() !== p.username.toLowerCase()) return say('Энэ username авагдсан байна.', true); patch.username = nv; }
           var f = file.files[0];
           if (f) {
             if (!TYPES[f.type]) return say('Зөвхөн JPG, PNG, WebP зураг оруулна.', true);
@@ -123,7 +123,7 @@
             patch.avatar_url = sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
           }
           if (!Object.keys(patch).length) return say('Өөрчлөлт алга.');
-          var r = await sb.from('profiles').update(patch).eq('id', S.user.id); if (r.error) throw r.error;
+          var r = await sb.from('profiles').update(patch).eq('id', S.user.id).select('id').single(); if (r.error) throw r.error;
           await loadUser((await sb.auth.getSession()).data.session); toast('Профайл хадгалагдлаа.');
         } catch (x) { say(err(x), true); } finally { save.disabled = false; }
       } }, 'Хадгалах');
@@ -205,6 +205,8 @@
 
   /* ---------- start ---------- */
   window.MSR = { comments: comments, profileView: profileView, openModal: openModal };
+  drawBar();
+  document.dispatchEvent(new CustomEvent('msr:ready'));
   if (ok) {
     sb.auth.onAuthStateChange(function (ev, session) {
       var uid = session && session.user ? session.user.id : null;
