@@ -3340,6 +3340,27 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     var note=document.createElement('p');note.textContent='Код дотор таны ID, item код, захиалгын ID багтсан. Төлбөрийг админ шалгаж баталгаажуулах хүртэл item нээгдэхгүй.';
     wrap.append(heading,value,copy,note);panel.insertBefore(wrap,panel.querySelector('.msr-shop-warning'));panel.scrollIntoView({behavior:'smooth',block:'center'});
   }
+  async function paintProfile(){
+    var hero=document.getElementById('msr-profile-hero');if(!hero)return;
+    var u=await user();if(!u)return;
+    var result=await client.from('msr_shop_inventory').select('product_id,category,equipped').eq('user_id',u.id).eq('equipped',true);
+    if(result.error)return;
+    var old=hero.querySelector('#msr-equipped-cosmetics');if(old)old.remove();
+    var items=result.data||[];if(!items.length)return;
+    var wrap=document.createElement('div');wrap.id='msr-equipped-cosmetics';
+    wrap.style.cssText='display:flex;flex-wrap:wrap;gap:8px;padding:8px 12px;align-items:center';
+    items.forEach(function(it){
+      var chip=document.createElement('span');chip.textContent=code(it.product_id)+' · '+it.category;chip.style.cssText='border:1px solid #68a8f0;background:#172a45;color:#dbeaff;padding:5px 9px;border-radius:12px;font-size:12px';
+      wrap.appendChild(chip);
+      var n=Number(it.product_id.slice(3));
+      if(it.category==='frame'){
+        var av=hero.querySelector('.msr-av');if(av){av.style.cssText='border:4px solid '+(['#67b5ff','#bb6dff','#f7cc56','#f08aaf','#67e2bf'][(n-1)%5])+';box-shadow:0 0 0 3px #182a45,0 0 22px '+(['#67b5ff','#bb6dff','#f7cc56','#f08aaf','#67e2bf'][(n-1)%5]);border-radius:50%'}
+      }else if(it.category==='banner'){hero.style.background='linear-gradient(120deg,#17243d 10%,#314a7a 55%,#13253a 100%)';hero.style.border='2px solid #618ee5'}
+      else if(it.category==='effect'){hero.style.boxShadow='0 0 22px rgba(110,160,255,.7),inset 0 0 30px rgba(100,90,220,.25)'}
+    });
+    hero.appendChild(wrap);
+  }
+  var profileTimer;new MutationObserver(function(){if(!document.getElementById('msr-profile-hero'))return;clearTimeout(profileTimer);profileTimer=setTimeout(paintProfile,250)}).observe(document.body,{childList:true,subtree:true});
   async function user(){var x=await client.auth.getUser();return x.data&&x.data.user}
   async function refresh(){
     var shop=document.querySelector('.msr-shop');if(!shop)return;
@@ -3360,7 +3381,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       var row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0';
       var label=document.createElement('span');label.textContent=item.product_id+' · '+item.category+(item.equipped?' · Equipped':'');
       var btn=document.createElement('button');btn.className='msr-shop-buy';btn.textContent=item.equipped?'Equipped':'Equip';btn.disabled=item.equipped;
-      btn.onclick=async function(){btn.disabled=true;var out=await client.rpc('msr_equip_cosmetic',{p_product_id:item.product_id});if(out.error)alert(out.error.message);await refresh()};
+      btn.onclick=async function(){btn.disabled=true;var out=await client.rpc('msr_equip_cosmetic',{p_product_id:item.product_id});if(out.error)alert(out.error.message);await refresh();await paintProfile()};
       row.append(label,btn);area.appendChild(row);
     });
     var orders=await client.from('msr_shop_orders').select('id,product_id,status,created_at').eq('user_id',u.id).order('created_at',{ascending:false}).limit(10);
@@ -3375,7 +3396,7 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     try{
       var admin=await client.rpc('msr_is_shop_admin');
       if(admin.error)throw admin.error;
-      if(admin.data===true){var equip=await client.rpc('msr_equip_cosmetic',{p_product_id:id});if(equip.error)throw equip.error;await refresh();return}
+      if(admin.data===true){var equip=await client.rpc('msr_equip_cosmetic',{p_product_id:id});if(equip.error)throw equip.error;await refresh();await paintProfile();return}
       var owned=await client.from('msr_shop_inventory').select('product_id').eq('user_id',u.id).eq('product_id',id).maybeSingle();
       if(owned.data){alert('You already own this item.');return}
       var pending=await client.from('msr_shop_orders').select('id,product_id').eq('user_id',u.id).eq('product_id',id).eq('status','pending').order('created_at',{ascending:false}).limit(1);
