@@ -50,7 +50,7 @@
   function drawBar() {
     var box = document.getElementById('msr-auth'); if (!box) return; box.textContent = '';
     if (!barBound) { barBound = true; document.addEventListener('click', function () { var p = document.querySelector('.msr-pop'); if (p) p.remove(); }); }
-    if (!S.user) { box.appendChild(el('button', { class: 'msr-btn', type: 'button', onclick: function () { openModal('login'); } }, 'Нэвтрэх')); return; }
+    if (!S.user) { box.appendChild(el('button', { class: 'msr-btn', type: 'button', onclick: function () { openModal('login'); } }, 'Log in')); return; }
     var menu = el('div', { class: 'msr-menu' }), btn = el('button', { class: 'msr-btn', type: 'button', 'aria-haspopup': 'true', style: 'display:flex;align-items:center;gap:8px', onclick: function (e) {
       e.stopPropagation(); var ex = menu.querySelector('.msr-pop'); if (ex) { ex.remove(); return; }
       menu.appendChild(el('div', { class: 'msr-pop' }, [el('a', { href: '#profile' }, 'Профайл'), el('button', { type: 'button', onclick: function () { sb.auth.signOut().then(function () { toast('Системээс гарлаа.'); if (location.hash === '#profile') location.hash = '#news'; }); } }, 'Гарах')]));
