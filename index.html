@@ -1869,7 +1869,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       h('p',{style:'color:#aab6c5;margin-bottom:22px'},'Баг болон тоглогчийн тусдаа VIP эрх. Одоогоор танилцуулга; төлбөр авахгүй.'),
       h('div',{style:'display:flex;flex-wrap:wrap;gap:18px'},
         plan('VIP CLAN','Багийн ахлагчид зориулсан эрх',[
-          ['200+ ELO','200 ELO-оос дээш өсөх боломж (эрх идэвхжсэний дараа)'],
+          ['300 ELO cap','Багийн ELO 50-аас эхэлж, хамгийн ихдээ 300 хүрнэ'],
           ['Team Profile Banner','Багийн профайл дээр өөрийн banner зураг байрлуулах'],
           ['VIP Clan Badge','Багийн нэрийн хажууд VIP тэмдэг']
         ]),
@@ -2114,14 +2114,33 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       mm.maps = [[shuf(MAPS)[0], null, null, 'soon', 'Decider']]; soon.push(mm);
     }
     // 4) ranking (elo)
+    // MSR ELO v2: initial 50, hard cap 300, match gain <=35 and loss <=40.
+    // All completed maps and their round scores contribute to the result.
     function elo(until) {
-      var r = {}; CODES.forEach(function (c) { r[c] = { e: 1000, w: 0, l: 0, f: [] }; });
+      var r = {}; CODES.forEach(function (c) { r[c] = { e: 50, w: 0, l: 0, f: [] }; });
       hist.slice().sort(function (x, y) { return x.date - y.date || x.id - y.id; }).forEach(function (m) {
         if (m.date > until) return;
-        var sa = 0, sb = 0; m.maps.forEach(function (x) { if (x[3] === 'done') { if (x[1] > x[2]) sa++; else sb++; } });
-        var A = r[m.a], B = r[m.b], ea = 1 / (1 + Math.pow(10, (B.e - A.e) / 400)), aw = sa > sb ? 1 : 0, K = m.bo === 3 ? 32 : 24;
-        A.e += K * (aw - ea); B.e -= K * (aw - ea);
-        if (aw) { A.w++; B.l++; A.f.push('w'); B.f.push('l'); } else { B.w++; A.l++; B.f.push('w'); A.f.push('l'); }
+        var A = r[m.a], B = r[m.b];
+        if (!A || !B) return;
+        var sa = 0, sb = 0, roundsA = 0, roundsB = 0, completed = 0;
+        m.maps.forEach(function (x) {
+          if (x[3] !== 'done' || !Number.isFinite(Number(x[1])) || !Number.isFinite(Number(x[2]))) return;
+          var ra = Number(x[1]), rb = Number(x[2]);
+          if (ra === rb) return;
+          completed++; roundsA += ra; roundsB += rb;
+          if (ra > rb) sa++; else sb++;
+        });
+        if (!completed || sa === sb) return;
+        var aWon = sa > sb, winner = aWon ? A : B, loser = aWon ? B : A;
+        var expected = 1 / (1 + Math.pow(10, (loser.e - winner.e) / 100));
+        var mapMargin = Math.abs(sa - sb) / completed;
+        var roundMargin = Math.abs(roundsA - roundsB) / Math.max(1, roundsA + roundsB);
+        var quality = 0.65 + 0.20 * mapMargin + 0.15 * roundMargin;
+        var gain = Math.max(1, Math.min(35, Math.round((9 + 26 * (1 - expected)) * quality)));
+        var loss = Math.max(1, Math.min(40, Math.round(gain * 40 / 35)));
+        winner.e = Math.min(300, winner.e + gain);
+        loser.e = Math.max(0, loser.e - loss);
+        winner.w++; loser.l++; winner.f.push('w'); loser.f.push('l');
       });
       return r;
     }
