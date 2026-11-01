@@ -1323,10 +1323,10 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
 }
 </style>
 <style id="msr-equipped-cosmetics-style">
-#msr-profile-hero .msr-avatar-edit-wrap.msr-equipped-frame{border:4px solid #68b6ff;border-radius:50%;box-shadow:0 0 0 3px #1a2941,0 0 18px #6caaff;position:relative}
-#msr-profile-hero .msr-avatar-edit-wrap.msr-equipped-frame .msr-av{border-radius:50%;width:100%;height:100%}
-#msr-profile-hero.msr-equipped-banner{background:linear-gradient(110deg,#0a1121,#263d66,#0c1326)!important;border:2px solid #5d88cc}
-#msr-profile-hero.msr-equipped-effect{box-shadow:0 0 22px #70b6ff88,inset 0 0 30px #7d65e855!important}
+#msr-profile-hero .msr-avatar-edit-wrap.msr-equipped-frame{position:relative!important;border:4px solid var(--msr-ring-color,#68b6ff)!important;border-radius:50%!important;box-shadow:0 0 0 3px #17263e,0 0 18px var(--msr-ring-color,#68b6ff)!important;box-sizing:border-box!important}
+#msr-profile-hero .msr-avatar-edit-wrap.msr-equipped-frame .msr-av{border-radius:50%!important;width:100%!important;height:100%!important}
+#msr-profile-hero.msr-equipped-banner{background:linear-gradient(110deg,#0a1121,var(--msr-banner-color,#263d66),#0c1326)!important;border:2px solid var(--msr-banner-color,#5d88cc)!important}
+#msr-profile-hero.msr-equipped-effect{box-shadow:0 0 22px var(--msr-effect-color,#70b6ff),inset 0 0 25px #7d65e855!important}
 </style></head>
 <body>
 <div id="sky" aria-hidden="true"><span class="st2"></span><span class="au au1"></span><span class="au au2"></span><span class="au au3"></span></div>
@@ -3438,18 +3438,27 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
     var u=await user();if(!u)return;
     var result=await client.from('msr_shop_inventory').select('product_id,category,equipped').eq('user_id',u.id).eq('equipped',true);
     if(result.error||!hero.isConnected)return;
+    var wrap=hero.querySelector('.msr-avatar-edit-wrap');
     var old=hero.querySelector('#msr-equipped-cosmetics');if(old)old.remove();
-    var av=hero.querySelector('.msr-avatar-edit-wrap')||hero.querySelector('.msr-av');
-    if(av){Array.from(av.classList).filter(function(c){return /^msr-frame-cos/.test(c)}).forEach(function(c){av.classList.remove(c)});}
+    var oldBanner=hero.querySelector('#msr-equipped-banner');if(oldBanner)oldBanner.remove();
+    var oldEffect=hero.querySelector('#msr-equipped-effect');if(oldEffect)oldEffect.remove();
+    if(wrap){Array.from(wrap.classList).filter(function(c){return /^msr-frame-cos/.test(c)}).forEach(function(c){wrap.classList.remove(c)});wrap.classList.remove('msr-equipped-frame');wrap.style.removeProperty('--msr-ring-color');}
     hero.classList.remove('msr-equipped-banner','msr-equipped-effect');
     Array.from(hero.classList).filter(function(c){return /^msr-(banner|effect)-cos/.test(c)}).forEach(function(c){hero.classList.remove(c)});
     var items=result.data||[];
-    if(!items.length)return;
+    var colors=['#00caff','#ff5a22','#aa5aff','#9feaff','#6dff3a','#ff244b','#ffc64d','#cbd6e5','#a12bff','#248aff','#4dff88','#dbe8ee','#9eafc8','#ef3348','#31db81','#9fceff','#a569ff','#ffbc43','#ef4a4a','#3dbdff','#c5d3e1','#f04cf5','#4dbb83','#ffa4df','#d9e6ff','#28b4ff','#ff592e','#c2e9ff','#73a9ef','#c34dff'];
     items.forEach(function(it){
-      if(!/^cos([1-9]|[12][0-9]|30)$/.test(it.product_id))return;
-      if(it.category==='frame'&&av){av.classList.add('msr-shop-ring-art','msr-frame-'+it.product_id);av.classList.add('msr-equipped-frame');}
-      if(it.category==='banner'){hero.classList.add('msr-equipped-banner','msr-banner-'+it.product_id);}
-      if(it.category==='effect'){hero.classList.add('msr-equipped-effect','msr-effect-'+it.product_id);}
+      var n=Number((it.product_id||'').replace(/^cos/,''));if(!Number.isInteger(n)||n<1||n>30)return;
+      var color=colors[n-1];
+      if(it.category==='frame'&&wrap){wrap.classList.add('msr-equipped-frame','msr-frame-'+it.product_id);wrap.style.setProperty('--msr-ring-color',color);}
+      if(it.category==='banner'){
+        hero.classList.add('msr-equipped-banner','msr-banner-'+it.product_id);
+        hero.style.setProperty('--msr-banner-color',color);
+      }
+      if(it.category==='effect'){
+        hero.classList.add('msr-equipped-effect','msr-effect-'+it.product_id);
+        hero.style.setProperty('--msr-effect-color',color);
+      }
     });
   }
   var profileTimer;new MutationObserver(function(){if(!document.getElementById('msr-profile-hero'))return;clearTimeout(profileTimer);profileTimer=setTimeout(paintProfile,250)}).observe(document.body,{childList:true,subtree:true});
