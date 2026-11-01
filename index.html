@@ -1260,7 +1260,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   RANK.forEach(function (r, idx) {
     var code = r[0], rnd = seeded(code), q = 1 - idx / 14;
     ROSTER[code].forEach(function (nick, k) {
-      PLAYERS.push({ nick: nick, team: code, maps: 0, kills: 0, deaths: 0, kd: 0 });
+      PLAYERS.push({ nick: nick, team: code, maps: 0, kills: 0, deatkd: 0 });
     });
   });
   PLAYERS.sort(function (a, b) { return b.kd - a.kd; });
@@ -2032,7 +2032,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   ALLM.forEach(function (m) { MBY[m.id] = m; });
 
   var PBY = {};
-  PLAYERS.forEach(function (p) { PBY[p.nick] = p; p.skill = DEMO.skill[p.nick] || 1; p.hs0 = 0.34 + seeded('hs' + p.nick)() * 0.28; });
+  PLAYERS.forEach(function (p) { PBY[p.nick] = p; p.skill = DEMO.skill[p.nick] || 1;  });
 
   var DET = {};
   function detail(m, i) {
@@ -2054,21 +2054,20 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       var deaths = distribute(K[1 - ti], sk.map(function (s) { return (1.55 - 0.5 * s) * (0.7 + rnd() * 0.6); }));
       rows[code] = roster.map(function (nick, j) {
         var k = kills[j], d = Math.min(R, deaths[j]), a = Math.round(k * (0.16 + rnd() * 0.2)), kpr = k / R, dpr = d / R, apr = a / R;
-        var hs = Math.round(k * Math.max(0.2, Math.min(0.8, PBY[nick].hs0 + (rnd() - 0.5) * 0.1)));
         var adr = Math.round(Math.max(30, 22 + 80 * kpr + 55 * apr + (rnd() - 0.5) * 12));
         var kast = Math.round(Math.max(40, Math.min(94, 72 + 28 * (kpr - 0.68) + 10 * (apr - 0.15) - 22 * (dpr - 0.68) + (rnd() - 0.5) * 8)));
-        return { nick: nick, team: code, R: R, k: k, d: d, a: a, hs: hs, adr: adr, kast: kast, rating: rate(kast, kpr, dpr, 2.13 * kpr + 0.42 * apr - 0.41, adr) };
+        return { nick: nick, team: code, R: R, k: k, d: d, a: a, adr: adr, kast: kast, rating: rate(kast, kpr, dpr, 2.13 * kpr + 0.42 * apr - 0.41, adr) };
       });
     });
     return (DET[key] = { R: R, sa: sa, sb: sb, aCT: aCT, a1: a1, b1: b1, a2: a2, b2: b2, h1: h1, hist: hist, rows: rows });
   }
   function agg(rows) {
-    var o = { n: rows.length, R: 0, k: 0, d: 0, a: 0, hs: 0, dmg: 0, kastR: 0 };
-    rows.forEach(function (r) { o.R += r.R; o.k += r.k; o.d += r.d; o.a += r.a; o.hs += r.hs; o.dmg += r.adr * r.R; o.kastR += r.kast * r.R; });
+    var o = { n: rows.length, R: 0, k: 0, d: 0, a: 0, dmg: 0, kastR: 0 };
+    rows.forEach(function (r) { o.R += r.R; o.k += r.k; o.d += r.d; o.a += r.a; o.dmg += r.adr * r.R; o.kastR += r.kast * r.R; });
     if (o.R) {
       o.kpr = o.k / o.R; o.dpr = o.d / o.R; o.apr = o.a / o.R; o.adr = o.dmg / o.R; o.kast = o.kastR / o.R; o.kd = o.k / Math.max(1, o.d);
-      o.hsp = o.k ? o.hs / o.k * 100 : 0; o.impact = 2.13 * o.kpr + 0.42 * o.apr - 0.41; o.rating = rate(o.kast, o.kpr, o.dpr, o.impact, o.adr);
-    } else { o.kpr = o.dpr = o.apr = o.adr = o.kast = o.kd = o.hsp = o.impact = 0; o.rating = 0; }
+      o.impact = 2.13 * o.kpr + 0.42 * o.apr - 0.41; o.rating = rate(o.kast, o.kpr, o.dpr, o.impact, o.adr);
+    } else { o.kpr = o.dpr = o.apr = o.adr = o.kast = o.kd = o.impact = 0; o.rating = 0; }
     return o;
   }
 
@@ -2079,7 +2078,7 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
       var d = detail(m, i); if (!d) return;
       [m.a, m.b].forEach(function (code, ti) {
         var opp = ti ? m.a : m.b, won = ti ? x[2] > x[1] : x[1] > x[2];
-        d.rows[code].forEach(function (r) { PMROWS.push({ m: m, mi: i, map: x[0], nick: r.nick, team: code, opp: opp, win: won, ev: m.ev, date: m.date, ago: ago(m.date), R: r.R, k: r.k, d: r.d, a: r.a, hs: r.hs, adr: r.adr, kast: r.kast, rating: r.rating }); });
+        d.rows[code].forEach(function (r) { PMROWS.push({ m: m, mi: i, map: x[0], nick: r.nick, team: code, opp: opp, win: won, ev: m.ev, date: m.date, ago: ago(m.date), R: r.R, k: r.k, d: r.d, a: r.a, adr: r.adr, kast: r.kast, rating: r.rating }); });
       });
     });
   });
