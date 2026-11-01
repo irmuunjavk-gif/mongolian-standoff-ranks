@@ -3,7 +3,7 @@
   'use strict';
   var C = window.MSR_CONFIG || {}, ok = !!(C.SUPABASE_URL && C.SUPABASE_ANON_KEY && window.supabase);
   var sb = ok ? window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth: { flowType: 'pkce', persistSession: true, autoRefreshToken: true } }) : null;
-  var S = { user: null, profile: null, admin: false }, PAGE = 10, UNAME = /^[A-Za-z0-9_]{3,20}$/, TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  var S = { user: null, profile: null, admin: false }, PAGE = 10, UNAME = /^(?=.{3,32}$)(?!.*[<>])(?!.*\s{2})[^\u0000-\u001F\u007F]+$/u, TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
   var AV = ok ? C.SUPABASE_URL.replace(/\/$/, '') + '/storage/v1/object/public/avatars/' : '', BACK = location.origin + location.pathname;
 
   var css = '.msr-auth{display:flex;align-items:center;gap:8px;margin-left:12px;margin-bottom:14px}@media(max-width:760px){.msr-auth{margin-left:auto;margin-bottom:10px}}.msr-btn{background:var(--surface,#161E2A);color:var(--text,#E9EDF3);border:1px solid var(--line,#2A3645);border-radius:8px;padding:8px 14px;font:inherit;font-weight:600;font-size:13px;cursor:pointer}.msr-btn:hover:not(:disabled){border-color:var(--tracer,#2FD27B)}.msr-btn:disabled{opacity:.5;cursor:default}.msr-btn.pri{background:var(--tracer,#2FD27B);color:#06130C;border-color:transparent}.msr-btn.sm{padding:4px 9px;font-size:12px}.msr-btn.link{background:none;border:0;padding:2px 4px;color:var(--muted,#8899AE)}.msr-btn.link:hover{color:var(--text,#E9EDF3)}'
@@ -70,7 +70,7 @@
     var email = el('input', { type: 'email', required: true, autocomplete: 'email', placeholder: 'Имэйл' });
     var pass = el('input', { type: 'password', required: true, minlength: 8, autocomplete: mode === 'login' ? 'current-password' : 'new-password', placeholder: mode === 'reset' ? 'Шинэ нууц үг (8+ тэмдэгт)' : 'Нууц үг (8+ тэмдэгт)' });
     var pass2 = el('input', { type: 'password', required: true, minlength: 8, autocomplete: 'new-password', placeholder: 'Нууц үгээ давтах' });
-    var user = el('input', { type: 'text', required: true, maxlength: 20, autocomplete: 'username', placeholder: 'Username (3–20: үсэг, тоо, _)' });
+    var user = el('input', { type: 'text', required: true, maxlength: 32, autocomplete: 'username', placeholder: 'Username (3–32, any language + symbols)' });
     var game = el('input', { type: 'text', required: true, inputmode: 'numeric', pattern: '[0-9]{4,20}', maxlength: 20, placeholder: 'Standoff 2 ID (зөвхөн тоо)' });
     var warning = el('p', { class: 'msr-note', style: 'padding:10px;border:1px solid var(--line);border-radius:8px' }, 'Анхааруулга: Standoff 2 ID-гаа зөв оруулна уу. Бүртгүүлсний дараа Discord-оор админд SO2 профайлын screenshot явуулж баталгаажуулна. ID давхардсан эсвэл буруу бол админтай холбогдоно.');
     var discordLink = el('a', { class: 'msr-btn pri', href: 'https://discord.com/users/1128188613230874727', target: '_blank', rel: 'noopener noreferrer', style: 'display:inline-block;text-decoration:none;text-align:center;margin-top:8px' }, 'Админтай холбогдох');
@@ -83,7 +83,7 @@
         if (mode === 'login') { var r = await sb.auth.signInWithPassword({ email: email.value.trim(), password: pass.value }); if (r.error) throw r.error; closeModal(); toast('Тавтай морил!'); }
         else if (mode === 'register') {
           var u = user.value.trim();
-          if (!UNAME.test(u)) return say('Username 3–20 тэмдэгт, зөвхөн латин үсэг, тоо, _ байна.', true);
+          if (!UNAME.test(u)) return say('Username 3–32 тэмдэгт: бүх хэлний үсэг, emoji, тэмдэг ашиглаж болно. < > зөвшөөрөхгүй.', true);
           if (pass.value !== pass2.value) return say('Нууц үг таарахгүй байна.', true);
           if (!/^[0-9]{4,20}$/.test(game.value.trim())) return say('Standoff 2 ID 4–20 оронтой тоо байх ёстой.', true);
           var check = await sb.from('player_id_verifications').select('game_id').eq('game_id', game.value.trim()).limit(1);
@@ -118,13 +118,13 @@
       if (!S.user) { box.appendChild(el('p', { class: 'msr-note' }, 'Профайлаа харахын тулд нэвтэрнэ үү.')); box.appendChild(el('button', { class: 'msr-btn pri', type: 'button', onclick: function () { openModal('login'); } }, 'Нэвтрэх / Бүртгүүлэх')); return; }
       var p = S.profile || { username: '' }, msg = el('p', { class: 'msr-msg', role: 'status' });
       function say(t, bad) { msg.textContent = t; msg.className = 'msr-msg ' + (bad ? 'bad' : 'ok'); }
-      var name = el('input', { type: 'text', maxlength: 20, value: p.username, 'aria-label': 'Username' });
+      var name = el('input', { type: 'text', maxlength: 32, value: p.username, 'aria-label': 'Username' });
       var file = el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp', 'aria-label': 'Профайл зураг', style: 'display:none' });
       var save = el('button', { class: 'msr-btn pri', type: 'button', onclick: async function () {
         save.disabled = true; say('');
         try {
           var patch = {}, nv = name.value.trim();
-          if (nv !== p.username) { if (!UNAME.test(nv)) return say('Username must be 3–20 characters: English letters, numbers or underscore (_). Hyphens (-) are not allowed. Use MSR_VERIFY_2026 instead.', true); var a = await sb.rpc('username_available', { name: nv }); if (a.error) throw a.error; if (!a.data && nv.toLowerCase() !== p.username.toLowerCase()) return say('Энэ username авагдсан байна.', true); patch.username = nv; }
+          if (nv !== p.username) { if (!UNAME.test(nv)) return say('Username must be 3–32 characters. Any language, emoji and symbols are supported except < > and control characters.', true); var a = await sb.rpc('username_available', { name: nv }); if (a.error) throw a.error; if (!a.data && nv.toLowerCase() !== p.username.toLowerCase()) return say('Энэ username авагдсан байна.', true); patch.username = nv; }
           var f = file.files[0];
           if (f) {
             if (!TYPES[f.type]) return say('Зөвхөн JPG, PNG, WebP зураг оруулна.', true);
