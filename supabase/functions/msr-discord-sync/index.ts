@@ -6,11 +6,11 @@ const norm=(s:string)=>s.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/
 function parse(content:string){
  const lines=content.replace(/[*\x60]/g,'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
  const clean=(s:string)=>s.replace(/^[\s#•\-–—:：『』【】<>👑]+|[\s『』【】]+$/gu,'').trim();
- const namePattern=/^(?:(?:clan|team)\s*name|name|team|багийн\s*нэр|баг)\s*[:：=-]\s*(.*)$/i;
+ const namePattern=/^(?:(?:clan|team)\s*name|name|team|багийн\s*нэр|баг)\s*[:：=\/\-]\s*(.*)$/i;
  let name='';
  for(let i=0;i<lines.length;i++){const m=clean(lines[i]).match(namePattern);if(m){name=clean(m[1]||lines[i+1]||'');break;}}
  if(!name && lines[0] && !/\d{5,}|https?:|captain|roster|main|sub|бүртгэл|registration/i.test(lines[0])) name=clean(lines[0]);
- const tag=lines.map(s=>clean(s).match(/^(?:(?:clan|team)\s*)?tag\s*[:：=-]\s*(.+)$/i)).find(Boolean)?.[1]?.replace(/[『』\[\]]/g,'').trim()||'';
+ const tag=lines.map(s=>clean(s).match(/^(?:(?:clan|team)\s*)?tag\s*[:：=\/\-]\s*(.+)$/i)).find(Boolean)?.[1]?.replace(/[『』\[\]]/g,'').trim()||'';
  if(!name||name.length>100||!norm(name))return null;
  name=name.replace(/[👑亗乂]/gu,'').replace(/\s*\[[^\]]{1,20}\]\s*$/,'').trim();
  const roster:string[]=[];
@@ -31,7 +31,7 @@ function parse(content:string){
   let prefix=line.slice(0,match.index);
   const brackets=line.match(/\[([^\]]{1,40})\]\s*\[\d{5,12}\]/);
   if(brackets)prefix=brackets[1];
-  else if(/^\s*(?:[-#•]\s*)?ID\s*[:：-]?\s*$/i.test(prefix)) prefix=lines[i-1]||'';
+  else if(/^\s*(?:[-#•~]\s*)?ID\s*[:：-]?\s*$/i.test(prefix)) prefix=lines[i-1]||'';
   const nick=nickname(prefix);
   if(!nick||nick.length>40||/https?:|clan|captain|roster|^main$|^sub$|name\s*:/i.test(nick)||/\d{5,}/.test(nick))continue;
   if(!roster.includes(nick))roster.push(nick);
@@ -66,13 +66,13 @@ Deno.serve(async(req)=>{
    if(!r.ok)throw Error('discord_'+r.status);
    const msgs=await r.json();if(!Array.isArray(msgs))throw Error('invalid_discord_response');
    for(const m of msgs){
-    seen++;const team=parse(m.content||'');if(!team){skipped++;continue;}
+    seen++;const snapshot=m.message_snapshots?.[0]?.message; const source=snapshot||m; const team=parse(source.content||'');if(!team){skipped++;continue;}
     const prev:any=map.get(team.name_key)||known.find((x:any)=>x.source_message_id===m.id);
     const timestamp=m.edited_timestamp||m.timestamp;
     if(prev && Date.parse(prev.source_timestamp) >= Date.parse(timestamp)) continue;
     const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(team.name_key)))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
     const id=prev?.id||'ds_'+hash;
-    const image=await logo(m.attachments,id).catch(()=>null);
+    const image=await logo(source.attachments||m.attachments,id).catch(()=>null);
     const row={...team,source_message_id:m.id,source_timestamp:timestamp,updated_at:new Date().toISOString(),...(image?{logo_url:image}:{})};
     if(prev)await db('msr_discord_teams?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(row),headers:{Prefer:'return=minimal'}});
     else await db('msr_discord_teams',{method:'POST',body:JSON.stringify({id,...row}),headers:{Prefer:'return=minimal'}});
