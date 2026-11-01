@@ -1739,11 +1739,14 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
   };
 
   V.players = function () {
-    var filter = 'all';
+    var filter = 'all', showAll = false;
+    var more = h('button', { type: 'button', class: 'players-show-all', style: 'display:none;margin:22px auto 0;padding:12px 26px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer' });
+    more.addEventListener('click', function () { showAll = !showAll; draw(); });
     var wrap = h('div', { class: 'pl-grid' });
     function draw() {
       wrap.textContent = '';
-      PLAYERS.filter(function (p) { return filter === 'all' || p.team === filter; }).forEach(function (p) {
+      var matched = PLAYERS.filter(function (p) { return filter === 'all' || p.team === filter; }).sort(function (a, b) { return a.rank - b.rank; });
+      matched.slice(0, showAll ? matched.length : 20).forEach(function (p) {
         wrap.appendChild(h('a', { class: 'plc', href: playerHref(p.nick) },
           h('div', { class: 'top' }, h('span', { class: 'av sg' + tc(p), title: p.nick }, sig(p.nick, 54)),
             h('div', null, h('div', { class: 'nk' }, tagEl(p.team), p.nick), gameIdEl(p.nick, p.team), h('div', { class: 'tm' }, crest(p.team), T[p.team].n)),
@@ -1753,16 +1756,19 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
             h('div', { class: 's' }, h('div', { class: 'k' }, 'Rating'), h('div', { class: 'v' }, p.rating.toFixed(2))),
             h('div', { class: 's' }, h('div', { class: 'k' }, 'Maps'), h('div', { class: 'v' }, p.maps)))));
       });
+      more.style.display = matched.length > 20 ? 'block' : 'none';
+      more.textContent = showAll ? 'Show Less' : 'Show All (' + (matched.length - 20) + ' more)';
+      more.setAttribute('aria-expanded', showAll ? 'true' : 'false');
     }
     var chips = h('div', { class: 'chips', role: 'group', 'aria-label': 'Filter by team' });
     var all = [['all', 'All']].concat(RANK.map(function (r) { return [r[0], T[r[0]].n]; }));
     all.forEach(function (c) {
       var b = h('button', { type: 'button', class: 'chip' + (c[0] === 'all' ? ' on' : '') }, c[0] !== 'all' ? crest(c[0]) : null, c[1]);
-      b.addEventListener('click', function () { filter = c[0]; [].slice.call(chips.children).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); });
+      b.addEventListener('click', function () { filter = c[0]; showAll = false; [].slice.call(chips.children).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); });
       chips.appendChild(b);
     });
     draw();
-    return h('div', null, pageHead('Players', PLAYERS.length + ' players, ranked by KD. The top 20 receive gold every 6 months.'), chips, wrap);
+    return h('div', null, pageHead('Players', PLAYERS.length + ' players, ranked by KD. The top 20 receive gold every 6 months.'), chips, wrap, more);
   };
 
   V.live = function () {
