@@ -74,8 +74,9 @@
     var user = el('input', { type: 'text', required: true, maxlength: 20, autocomplete: 'username', placeholder: 'Username (3–20: үсэг, тоо, _)' });
     var game = el('input', { type: 'text', required: true, inputmode: 'numeric', pattern: '[0-9]{4,20}', maxlength: 20, placeholder: 'Standoff 2 ID (зөвхөн тоо)' });
     var warning = el('p', { class: 'msr-note', style: 'padding:10px;border:1px solid var(--line);border-radius:8px' }, 'Анхааруулга: Standoff 2 ID-гаа зөв оруулна уу. Бүртгүүлсний дараа Discord-оор админд SO2 профайлын screenshot явуулж баталгаажуулна. ID давхардсан эсвэл буруу бол админтай холбогдоно.');
+    var discordLink = el('a', { class: 'msr-btn pri', href: 'https://discord.com/users/1128188613230874727', target: '_blank', rel: 'noopener noreferrer', style: 'display:inline-block;text-decoration:none;text-align:center;margin-top:8px' }, 'Админтай холбогдох');
     var go = el('button', { class: 'msr-btn pri', type: 'submit' }, mode === 'login' ? 'Нэвтрэх' : mode === 'register' ? 'Бүртгүүлэх' : mode === 'forgot' ? 'Холбоос илгээх' : 'Хадгалах');
-    var fields = mode === 'login' ? [email, pass] : mode === 'register' ? [user, game, email, pass, pass2, warning] : mode === 'forgot' ? [email] : [pass, pass2];
+    var fields = mode === 'login' ? [email, pass] : mode === 'register' ? [user, game, email, pass, pass2, warning, discordLink] : mode === 'forgot' ? [email] : [pass, pass2];
     if (mode === 'reset') fields = [pass, pass2];
     var form = el('form', { onsubmit: async function (e) {
       e.preventDefault(); go.disabled = true; say('');
@@ -145,7 +146,7 @@
         var r = await sb.from('player_id_verifications').select('game_id,status').eq('user_id', S.user.id).maybeSingle();
         if (!box.isConnected) return;
         if (r.error) { claimBox.appendChild(el('p', { class: 'msr-note' }, 'ID мэдээллийг ачаалж чадсангүй.')); return; }
-        if (r.data) { claimBox.appendChild(el('p', null, 'ID: ' + r.data.game_id + ' · ' + (r.data.status === 'verified' ? '✓ Verified' : r.data.status === 'rejected' ? 'Rejected — админтай холбогдоно уу' : 'Pending — Discord-оор screenshot илгээнэ үү'))); return; }
+        if (r.data) { claimBox.appendChild(el('p', null, 'ID: ' + r.data.game_id + ' · ' + (r.data.status === 'verified' ? '✓ Verified' : r.data.status === 'rejected' ? 'Rejected — админтай холбогдоно уу' : 'Pending — Discord-оор screenshot илгээнэ үү'))); claimBox.appendChild(el('a', { class: 'msr-btn pri', href: 'https://discord.com/users/1128188613230874727', target: '_blank', rel: 'noopener noreferrer', style: 'display:inline-block;text-decoration:none;text-align:center;margin-top:8px' }, 'Админтай холбогдох')); return; }
         var saved = ''; try { saved = localStorage.getItem('msr-pending-game-' + S.user.id) || ''; } catch (_) {}
         var input = el('input', { type: 'text', inputmode: 'numeric', maxlength: 20, placeholder: 'Standoff 2 ID', value: saved, style: 'font-size:16px;max-width:100%;padding:10px' });
         var add = el('button', { class: 'msr-btn pri', type: 'button', onclick: async function () {
@@ -157,7 +158,7 @@
           try { localStorage.removeItem('msr-pending-game-' + S.user.id); } catch (_) {}
           claimBox.textContent = 'ID: ' + id + ' · Pending — Discord-оор screenshot илгээнэ үү';
         } }, 'ID бүртгүүлэх');
-        claimBox.appendChild(el('p', { class: 'msr-note' }, 'SO2 ID-гаа бүртгүүлээд Discord-оор screenshot явуулна уу.')); claimBox.appendChild(input); claimBox.appendChild(add);
+        claimBox.appendChild(el('p', { class: 'msr-note' }, 'SO2 ID-гаа бүртгүүлээд Discord-оор screenshot явуулна уу.')); claimBox.appendChild(input); claimBox.appendChild(add); claimBox.appendChild(el('a', { class: 'msr-btn pri', href: 'https://discord.com/users/1128188613230874727', target: '_blank', rel: 'noopener noreferrer', style: 'display:inline-block;text-decoration:none;text-align:center;margin-top:8px' }, 'Админтай холбогдох'));
       })();
       if (S.admin) {
         var adminBox = el('div', { style: 'margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:10px' }, el('h3', null, 'Admin · ID Verification'));
