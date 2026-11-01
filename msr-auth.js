@@ -135,7 +135,7 @@
   }
 
   /* ---------- comments ---------- */
-  var SEL = 'id,body,created_at,edited_at,like_count,parent_id,user_id,profiles(username,avatar_url)', lastPost = 0;
+  var SEL = 'id,body,created_at,edited_at,like_count,parent_id,user_id,profiles!news_comments_user_id_fkey(username,avatar_url)', lastPost = 0;
   function comments(aid) {
     aid = String(aid); var root = el('section', { class: 'msr-cm', 'aria-label': 'Сэтгэгдэл' });
     if (!ok) { root.appendChild(el('h3', null, 'Сэтгэгдэл')); root.appendChild(el('p', { class: 'msr-note' }, 'Сэтгэгдлийн систем одоохондоо тохируулагдаагүй байна.')); return root; }
