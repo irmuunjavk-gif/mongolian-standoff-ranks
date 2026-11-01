@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://thunderous-frangipane-a56292.netlify.app/sitemap.xml
