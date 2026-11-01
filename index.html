@@ -896,6 +896,36 @@ html .plc .av.sg { width: 62px; height: 62px; }
 .msr-shop-preview{height:140px}.msr-shop-ring{width:90px;height:90px;padding:6px}.msr-shop-face{font-size:17px}.msr-shop-ring-art:before{background:conic-gradient(from 20deg,var(--fx),transparent 24%,var(--fx) 43%,#fff 48%,var(--fx) 56%,transparent 72%,var(--fx));box-shadow:0 0 16px var(--fx);animation:msr-spin 5s linear infinite}.msr-shop-ring-art:after{content:'✦';position:absolute;top:-8px;right:4px;color:var(--fx);font-size:23px;text-shadow:0 0 9px var(--fx);animation:msr-frost 2s infinite alternate}
 .msr-banner-art{height:82px;width:94%;background:radial-gradient(circle at 70% 30%,var(--fx),transparent 35%),linear-gradient(145deg,#070c17,#172538 60%,#060a12);border:1px solid var(--fx);font-size:29px;letter-spacing:0;overflow:hidden;animation:msr-aurora 7s ease infinite;background-size:160% 160%}.msr-banner-art span{filter:drop-shadow(0 0 12px var(--fx))}.msr-shop-effect-art{font-size:64px;color:var(--fx);text-shadow:0 0 25px var(--fx);animation:msr-frost 2s infinite alternate}.msr-shop-detail{padding:11px}.msr-shop-detail h3{font-size:15px;margin:5px 0}.msr-shop-detail p{font-size:11px;min-height:0;margin:4px 0}.msr-shop-foot{margin-top:9px;flex-wrap:wrap}.msr-shop-foot b{font-size:15px}.msr-shop-buy{font-size:10px;padding:7px 8px}
 @media(max-width:850px){.msr-shop-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:580px){.msr-shop-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.msr-shop-preview{height:125px}.msr-shop-detail{padding:10px}.msr-shop-ring{width:82px;height:82px}.msr-shop-detail h3{font-size:14px}.msr-shop-foot b{font-size:14px}}
+
+/* Discord-inspired dense cosmetics gallery */
+.msr-shop{max-width:1100px;margin-inline:auto}.msr-shop-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:11px!important}
+.msr-shop-item{border-radius:13px!important;background:#191b25!important;border:1px solid #323747!important;box-shadow:none!important;display:flex;flex-direction:column}
+.msr-shop-preview{height:132px!important;min-height:0!important;background:radial-gradient(ellipse at 50% 60%,#282c3c 0%,#171923 70%)!important;padding:12px!important}
+.msr-shop-detail{padding:10px 11px 12px!important;display:flex;flex-direction:column;flex:1}
+.msr-shop-kind{font-size:9px!important;letter-spacing:.7px!important;color:#aab4cc!important}
+.msr-shop-detail h3{font-size:14px!important;line-height:1.25!important;margin:5px 0 8px!important}
+.msr-shop-detail p{display:none!important}
+.msr-shop-foot{margin-top:auto!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:7px!important}
+.msr-shop-foot b{font-size:14px!important}.msr-shop-buy{font-size:11px!important;padding:7px 10px!important;background:#5865f2!important;border-color:#6975ff!important;border-radius:7px!important}
+.msr-shop-ring{width:92px!important;height:92px!important;padding:5px!important}.msr-shop-face{background:#333745!important;border:0!important;font-size:16px!important;color:#9ba4ba!important}
+.msr-shop-ring-art:before{background:conic-gradient(from 45deg,var(--fx),transparent 16%,var(--fx) 30%,#fff 37%,var(--fx) 47%,transparent 62%,var(--fx) 83%,#fff 94%,var(--fx))!important;box-shadow:0 0 13px var(--fx)!important;animation:msr-spin 7s linear infinite!important}
+.msr-shop-ring-art:after{content:'✦'!important;top:-5px!important;right:0!important;font-size:19px!important}
+.msr-frame-cos12:before{background:conic-gradient(#d6e4ee,#0c111b,#e4f1f7,#080b11,#b8d3e0,#060a10)!important;clip-path:polygon(50% 0,61% 5%,70% 0,77% 12%,89% 10%,90% 23%,100% 33%,94% 45%,100% 56%,90% 66%,91% 79%,77% 85%,69% 100%,55% 94%,43% 100%,31% 91%,18% 94%,15% 78%,0 69%,7% 56%,0 43%,10% 31%,9% 18%,24% 14%,33% 2%)}
+.msr-frame-cos7:after{content:'♛'!important;font-size:28px!important;top:-16px!important;right:30px!important}
+.msr-banner-art{width:100%!important;height:87px!important;border:0!important;border-radius:6px!important;position:relative;overflow:hidden;background:linear-gradient(155deg,#111827,#232a3a 60%,#070b13)!important;box-shadow:none!important;animation:none!important}
+.msr-banner-art:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 72% 28%,var(--fx),transparent 32%),linear-gradient(0deg,#05070c,transparent 55%);opacity:.68}
+.msr-banner-moon{position:absolute;width:51px;height:51px;border-radius:50%;right:18%;top:6px;background:radial-gradient(circle at 38% 35%,#e2e9ee,#6e8497 65%,#37495b);box-shadow:0 0 19px #d5eaff55}
+.msr-banner-scene{position:absolute;bottom:-9px;left:13%;font-size:49px!important;filter:drop-shadow(0 0 3px #050507);color:#05060a;z-index:2}
+.msr-banner-cos13{background:linear-gradient(120deg,#080b0f,#252d35,#050608)!important}.msr-banner-cos13:before{background:linear-gradient(0deg,#020304,transparent 55%),repeating-linear-gradient(95deg,transparent 0 21px,#070a0e 22px 24px)!important;opacity:.85}.msr-banner-cos13 .msr-banner-moon{right:14%;width:58px;height:58px}.msr-banner-cos13 .msr-banner-scene{left:33%;bottom:-18px;font-size:64px!important}
+.msr-banner-cos14:before,.msr-banner-cos19:before{background:radial-gradient(circle at 68% 22%,#ff3944,transparent 35%),linear-gradient(0deg,#2b0609,#07060a)!important}
+.msr-banner-cos16 .msr-banner-scene,.msr-banner-cos23 .msr-banner-scene{font-size:60px!important}
+.msr-banner-cos24 .msr-banner-scene{color:#ffa6df}
+.msr-shop-effect-art{position:relative!important;width:92px;height:92px!important;font-size:0!important}
+.msr-shop-effect-art i{position:absolute;width:8px;height:8px;border-radius:2px;background:var(--fx);box-shadow:0 0 13px var(--fx);left:20%;top:30%;animation:msr-frost 1.8s ease-in-out infinite alternate}
+.msr-shop-effect-art i:nth-child(2){left:65%;top:15%;animation-delay:.3s;transform:rotate(45deg)}.msr-shop-effect-art i:nth-child(3){left:48%;top:67%;animation-delay:.6s}.msr-shop-effect-art i:nth-child(4){left:82%;top:51%;animation-delay:.9s;transform:rotate(35deg)}
+.msr-effect-cos26{border:3px solid var(--fx);border-radius:50%;box-shadow:0 0 22px var(--fx);animation:msr-spin 4s linear infinite}.msr-effect-cos28 i{clip-path:polygon(50% 0,65% 37%,100% 50%,65% 63%,50% 100%,35% 63%,0 50%,35% 37%)}
+@media(max-width:800px){.msr-shop-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:590px){.msr-shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.msr-shop-preview{height:115px!important;padding:9px!important}.msr-shop-detail{padding:9px!important}.msr-shop-ring{width:78px!important;height:78px!important}.msr-shop-face{font-size:14px!important}.msr-shop-detail h3{font-size:13px!important}.msr-shop-foot b{font-size:13px!important}.msr-shop-buy{font-size:10px!important}.msr-banner-art{height:71px!important}.msr-banner-moon{width:40px;height:40px}}
 </style>
 
 <style id="polish">
@@ -3014,10 +3044,14 @@ html .pl-grid .plc .av.sg{width:42px!important;height:42px!important;min-width:4
       h('div', { class:'msr-shop-head' }, h('span', { class:'msr-shop-kicker' }, 'MSR COSMETICS'), h('h1', null, '✨ MSR Shop'), h('p', null, 'Animated avatar decorations, banners and profile effects. Preview the first collection below.')),
       h('div', { class:'msr-shop-grid' }, products.map(function(p) {
         var demo = p.kind === 'Profile Banner'
-          ? h('div', { class:'msr-shop-banner msr-banner-art', style:'--fx:'+p.color }, h('span',null,p.title==='Raven Night'?'☾ 🐦‍⬛':p.title==='Dragon'?'🐉':p.title==='Sakura'?'🌸':p.title==='Frost Peak'?'🏔️':p.title==='Samurai'?'⚔️':p.title==='Forest'?'🌲':'✦'))
+          ? h('div', { class:'msr-shop-banner msr-banner-art msr-banner-'+p.id, style:'--fx:'+p.color },
+              h('span',{class:'msr-banner-moon'},''),
+              h('span',{class:'msr-banner-scene'},p.title==='Raven Night'?'♠':p.title==='Dragon'?'〰':p.title==='Frost Peak'?'▲':p.title==='Forest'?'♠':p.title==='Sakura'?'✿':''))
           : p.kind === 'Profile Effect'
-          ? h('div',{class:'msr-shop-effect-art',style:'--fx:'+p.color},h('span',null,p.title==='Snowfall'?'❄':p.title==='Ember'?'✦':p.title==='Rain'?'☔':'✧'))
-          : h('div', { class:'msr-shop-ring msr-shop-ring-art',style:'--fx:'+p.color }, h('div', { class:'msr-shop-face' }, 'MSR'));
+          ? h('div',{class:'msr-shop-effect-art msr-effect-'+p.id,style:'--fx:'+p.color},
+              h('i',null,''),h('i',null,''),h('i',null,''),h('i',null,''))
+          : h('div', { class:'msr-shop-ring msr-shop-ring-art msr-frame-'+p.id,style:'--fx:'+p.color },
+              h('div', { class:'msr-shop-face' }, 'MSR'));
         return h('div', { class:'msr-shop-item' },
           h('div', { class:'msr-shop-preview' }, demo),
           h('div', { class:'msr-shop-detail' }, h('span', { class:'msr-shop-kind' }, p.kind), h('h3', null, p.title), h('p', null, p.desc),
