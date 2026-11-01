@@ -1069,13 +1069,18 @@ table.t tr.mapr { background: linear-gradient(90deg, rgba(22,30,42,.97) 0%, rgba
  body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
  header.top .top-in{min-height:74px;display:flex;align-items:center}
  header.top .brand{align-self:center}
- .mobile-dock{display:flex;position:fixed;z-index:150;bottom:calc(12px + env(safe-area-inset-bottom));left:16px;right:16px;gap:8px;height:66px}
+ .mobile-dock{display:flex;position:fixed;z-index:150;bottom:calc(20px + env(safe-area-inset-bottom));left:5%;right:5%;gap:8px;height:62px}
  .dock-tabs{display:flex;flex:1;min-width:0;padding:4px;background:rgba(36,46,59,.95);border:1px solid #536176;border-radius:40px;backdrop-filter:blur(20px)}
  .dock-tabs a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#e4edf7;font-size:12px;border-radius:35px}
  .dock-tabs a.on{background:rgba(207,220,237,.2)}
- .dock-tabs svg{width:24px;height:24px}
- #mobile-burger-slot .burger{display:flex!important;width:66px;height:66px;margin:0!important;border-radius:50%;background:rgba(36,46,59,.97);border:1px solid #536176;align-items:center;justify-content:center}
- header.top.open nav.main.mob{position:fixed;z-index:149;bottom:calc(90px + env(safe-area-inset-bottom));left:16px;right:16px;display:flex;flex-direction:column;padding:20px;gap:12px;border:1px solid #465468;border-radius:24px;background:rgba(28,36,46,.98);box-shadow:0 12px 50px #0008}
+ .dock-tabs svg{width:25px;height:25px}
+ .dock-tabs a{font-size:12px;font-weight:600;letter-spacing:.01em}
+ #mobile-burger-slot{flex:0 0 62px}
+ #mobile-burger-slot .burger svg{width:28px;height:28px}
+ .dock-tabs a[data-r="news"]{position:relative}
+ .dock-tabs a[data-r="news"]::before{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:#f34b4b;top:4px;left:calc(50% + 8px)}
+ #mobile-burger-slot .burger{display:flex!important;width:62px;height:62px;margin:0!important;border-radius:50%;background:rgba(36,46,59,.97);border:1px solid #536176;align-items:center;justify-content:center}
+ header.top.open nav.main.mob{position:fixed;z-index:149;bottom:calc(96px + env(safe-area-inset-bottom));left:5%;right:5%;display:flex;flex-direction:column;padding:20px;gap:12px;border:1px solid #465468;border-radius:24px;background:rgba(28,36,46,.98);box-shadow:0 12px 50px #0008}
  #mmenu .search.mq{display:none!important}
  #mmenu>a{font-size:18px;padding:17px;background:transparent;border:0;border-bottom:1px solid #ffffff18;border-radius:0}
  #mobile-auth-slot #msr-auth{display:flex;width:100%;justify-content:stretch}
