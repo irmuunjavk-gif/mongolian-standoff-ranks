@@ -44,15 +44,30 @@ Object.assign(dict,{
 "МОНГОЛЫН STANDOFF ЦАХИМ СПОРТЫН ИРЭЭДҮЙ":"THE FUTURE OF MONGOLIAN STANDOFF ESPORTS"
 });
 Object.assign(dict,{"MSR нь Монголын Standoff 2 багуудын чансаа, тоглогчдын статистик, тоглолтын үр дүн болон тэмцээний мэдээллийг нэг дор харуулна.":"MSR brings Mongolian Standoff 2 team rankings, player statistics, match results and tournament information together in one place.","Багуудын ELO чансаа, тоглогчдын үзүүлэлт болон тоглолтын үр дүнг үзээрэй.":"Follow team ELO rankings, compare player performance and check the latest match results.","Чансаа. Статистик. Үр дүн. Нэг дор.":"Rankings. Stats. Results. All in one place."});
+Object.assign(dict,{
+"Official guide · 11-р сарын 2":"Official guide · November 2",
+"MSR-д хэрхэн бүртгүүлж, нэвтрэх вэ? — Алхам алхмаар заавар":"How to register and log in to MSR — Step-by-step guide",
+"Mongolian Standoff Ranks-ийн аккаунт үүсгэх, Standoff 2 ID бүртгүүлэх, имэйл баталгаажуулах болон нууц үгээ сэргээх заавар.":"Learn how to create an MSR account, register your Standoff 2 ID, confirm your email and reset your password.",
+"MSR (Mongolian Standoff Ranks) дээр хувийн профайл үүсгэхийн тулд сайтын Log in товчийг дарна. Хэрэв аккаунтгүй бол Register / Бүртгүүлэх хэсгийг сонгоорой.":"To create a personal MSR profile, tap Log in on the website. If you do not have an account, select Register.",
+"1. Username: 3–32 тэмдэгттэй нэрээ оруулна. Дараа нь өөрийн Standoff 2 ID-г 4–20 оронтой тоогоор, алдаагүй бичнэ. Энэ ID-г өөр хүнийхээр бүртгүүлэхгүй.":"1. Enter a username of 3–32 characters. Then enter your own Standoff 2 ID (4–20 digits). Do not register someone else's ID.",
+"2. Ашигладаг имэйл хаягаа оруулж, 8-аас дээш тэмдэгттэй нууц үг үүсгэн давтан баталгаажуулна. Бүртгүүлэх товчийг дарна.":"2. Enter an email address you use, create a password of at least 8 characters, confirm it, and press Register.",
+"3. Хэрэв баталгаажуулах имэйл ирвэл имэйл доторх холбоос дээр дарж бүртгэлээ идэвхжүүлнэ. Дараа нь Log in хэсэгт имэйл болон нууц үгээрээ нэвтэрнэ.":"3. If you receive a confirmation email, open its link to activate your account. Then sign in with your email and password.",
+"4. Standoff 2 ID-ийн баталгаажуулалт тусдаа явагдана. Өөрийн тоглоомын профайлын screenshot-ийг MSR админд Discord-оор явуулна. ID давхардсан эсвэл буруу бол админтай холбогдоорой.":"4. Standoff 2 ID verification is separate. Send a screenshot of your game profile to an MSR admin on Discord. Contact the admin if the ID is incorrect or already registered.",
+"5. Нэвтэрсний дараа Profile хэсэгт username болон профайл зургаа тохируулж болно. Shop хэсэгт захиалгын түүх, өөрийн Inventory болон эзэмшдэг item-аа харах боломжтой. Төлбөр автоматаар баталгаажих үйлчилгээ одоогоор идэвхгүй тул төлбөр хийхээсээ өмнө админтай баталгаажуулна.":"5. After signing in, customize your username and profile picture in Profile. In Shop, view your orders and owned items in Inventory. Automatic payment verification is not active yet, so confirm with an admin before transferring money.",
+"Нууц үгээ мартсан бол Log in → Нууц үгээ мартсан уу? хэсэгт имэйлээ оруулж сэргээх холбоос авна. Нууц үг болон имэйл баталгаажуулах кодоо хэнд ч битгий дамжуулаарай.":"If you forgot your password, open Log in → Forgot password and request a reset link by email. Never share your password or email verification codes.",
+"Тусламж хэрэгтэй бол MSR-ийн админтай Discord-оор холбогдоно уу: https://discord.com/users/1128188613230874727":"For help, contact an MSR admin on Discord: https://discord.com/users/1128188613230874727",
+"Мэдээг нээж сэтгэгдэл үлдээх →":"Open article and comment →",
+"MSR аккаунтаараа нэвтрэх":"Sign in to your MSR account",
+"MSR аккаунт үүсгэх":"Create an MSR account",
+"Бүртгэлтэй имэйл, нууц үгээ оруулна. Нэвтэрсний дараа профайл, Shop захиалга болон Inventory-гаа харах боломжтой.":"Enter your registered email and password. After signing in, you can access your profile, Shop orders and Inventory.",
+"Username, Standoff 2 ID, имэйл, 8-аас дээш тэмдэгттэй нууц үг шаардлагатай. Имэйл баталгаажуулалт шаардагдаж болно.":"You need a username, Standoff 2 ID, email and a password of at least 8 characters. Email verification may be required.",
+"Нууц үгээ мартсан бол доорх сэргээх холбоосыг ашиглаарай.":"If you forgot your password, use the reset link below.",
+"Standoff 2 ID-г зөвхөн өөрийнхөө ID-аар бүртгүүлнэ. ID-г админ баталгаажуулна. Нууц үгээ хэнд ч бүү өг.":"Only register your own Standoff 2 ID. An admin will verify it. Never share your password.",
+"11-р сарын 2":"November 2"
+});
 var inverse={};Object.keys(dict).forEach(function(k){inverse[dict[k]]=k;});
 var current='en';try{current=localStorage.getItem('msr-language')==='mn'?'mn':'en';}catch(e){}
 function convert(s){if(!s||!s.trim())return s;var t=s.trim(),translated=(current==='en'?dict:inverse)[t];if(!translated){var m=t.match(/^ID: (.+?) · (Pending|Rejected|Verified) — (.+)$/);if(m){var tail=m[3];if(current==='en')tail=tail.replace('Discord-оор screenshot илгээнэ үү','Send a screenshot on Discord').replace('админтай холбогдоно уу','Contact admin');else tail=tail.replace('Send a screenshot on Discord','Discord-оор screenshot илгээнэ үү').replace('Contact admin','админтай холбогдоно уу');translated='ID: '+m[1]+' · '+m[2]+' — '+tail;}}
-if(!translated && current==='en' && /[\u0400-\u04FF]/.test(t)) {
-  // Never show untranslated Cyrillic in English mode. Long-form news is marked
-  // as pending translation instead of pretending to have a faithful translation.
-  if(t.length>170) translated='English translation for this article is being prepared.';
-  else translated='English translation pending.';
-}
 if(!translated)return s;return s.replace(t,translated);}
 function translate(root){if(!root||root.nodeType!==1||root.closest('script,style,textarea,code,pre,[contenteditable],.msr-c .tx,.msr-no-translate'))return;var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),n;while((n=walker.nextNode())){if(n.parentElement&&n.parentElement.closest('script,style,textarea,code,pre,[contenteditable],.msr-c .tx'))continue;var v=convert(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;}root.matches('[placeholder],[aria-label]')?[root].concat(Array.from(root.querySelectorAll('[placeholder],[aria-label]'))):root.querySelectorAll('[placeholder],[aria-label]').forEach(function(e){['placeholder','aria-label'].forEach(function(a){var v=e.getAttribute(a);if(v){var x=convert(v);if(x!==v)e.setAttribute(a,x);}});});}
 function apply(){document.documentElement.lang=current==='en'?'en':'mn';translate(document.body);document.querySelectorAll('[data-msr-lang]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.msrLang===current));b.classList.toggle('active',b.dataset.msrLang===current);});}
