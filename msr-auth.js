@@ -72,8 +72,10 @@
     var pass = el('input', { type: 'password', required: true, minlength: 8, autocomplete: mode === 'login' ? 'current-password' : 'new-password', placeholder: mode === 'reset' ? 'Шинэ нууц үг (8+ тэмдэгт)' : 'Нууц үг (8+ тэмдэгт)' });
     var pass2 = el('input', { type: 'password', required: true, minlength: 8, autocomplete: 'new-password', placeholder: 'Нууц үгээ давтах' });
     var user = el('input', { type: 'text', required: true, maxlength: 20, autocomplete: 'username', placeholder: 'Username (3–20: үсэг, тоо, _)' });
+    var game = el('input', { type: 'text', required: true, inputmode: 'numeric', pattern: '[0-9]{4,20}', maxlength: 20, placeholder: 'Standoff 2 ID (зөвхөн тоо)' });
+    var warning = el('p', { class: 'msr-note', style: 'padding:10px;border:1px solid var(--line);border-radius:8px' }, 'Анхааруулга: Standoff 2 ID-гаа зөв оруулна уу. Бүртгүүлсний дараа Discord-оор админд SO2 профайлын screenshot явуулж баталгаажуулна. ID давхардсан эсвэл буруу бол админтай холбогдоно.');
     var go = el('button', { class: 'msr-btn pri', type: 'submit' }, mode === 'login' ? 'Нэвтрэх' : mode === 'register' ? 'Бүртгүүлэх' : mode === 'forgot' ? 'Холбоос илгээх' : 'Хадгалах');
-    var fields = mode === 'login' ? [email, pass] : mode === 'register' ? [user, email, pass, pass2] : mode === 'forgot' ? [email] : [pass, pass2];
+    var fields = mode === 'login' ? [email, pass] : mode === 'register' ? [user, game, email, pass, pass2, warning] : mode === 'forgot' ? [email] : [pass, pass2];
     if (mode === 'reset') fields = [pass, pass2];
     var form = el('form', { onsubmit: async function (e) {
       e.preventDefault(); go.disabled = true; say('');
@@ -83,9 +85,17 @@
           var u = user.value.trim();
           if (!UNAME.test(u)) return say('Username 3–20 тэмдэгт, зөвхөн латин үсэг, тоо, _ байна.', true);
           if (pass.value !== pass2.value) return say('Нууц үг таарахгүй байна.', true);
+          if (!/^[0-9]{4,20}$/.test(game.value.trim())) return say('Standoff 2 ID 4–20 оронтой тоо байх ёстой.', true);
+          var check = await sb.from('player_id_verifications').select('game_id').eq('game_id', game.value.trim()).limit(1);
+          if (check.error) throw check.error;
+          if (check.data && check.data.length) return say('Энэ ID аль хэдийн бүртгэлтэй. Админтай Discord-оор холбогдоно уу.', true);
           var av = await sb.rpc('username_available', { name: u }); if (av.error) throw av.error; if (!av.data) return say('Энэ username аль хэдийн авагдсан байна.', true);
           var s = await sb.auth.signUp({ email: email.value.trim(), password: pass.value, options: { data: { username: u }, emailRedirectTo: BACK } }); if (s.error) throw s.error;
-          if (s.data.session) { closeModal(); toast('Бүртгэл амжилттай!'); } else say('Баталгаажуулах холбоос имэйлээр илгээгдлээ. Имэйлээ шалгаад холбоос дээр дарна уу.');
+          if (s.data.user && s.data.session) {
+            var claim = await sb.from('player_id_verifications').insert({ user_id: s.data.user.id, game_id: game.value.trim(), status: 'pending' });
+            if (claim.error) toast('Аккаунт үүссэн ч ID бүртгэгдээгүй. Профайл хэсгээс ID-гаа оруулна уу.', true);
+          } else if (s.data.user) { try { localStorage.setItem('msr-pending-game-' + s.data.user.id, game.value.trim()); } catch (_) {} }
+          if (s.data.session) { closeModal(); toast('Бүртгэл амжилттай! ID баталгаажуулалт хүлээгдэж байна.'); } else say('Баталгаажуулах холбоос имэйлээр илгээгдлээ. Имэйлээ шалгаад холбоос дээр дарна уу.');
         } else if (mode === 'forgot') { var f = await sb.auth.resetPasswordForEmail(email.value.trim(), { redirectTo: BACK }); if (f.error) throw f.error; say('Хэрэв энэ имэйл бүртгэлтэй бол сэргээх холбоос илгээгдлээ.'); }
         else { if (pass.value !== pass2.value) return say('Нууц үг таарахгүй байна.', true); var up = await sb.auth.updateUser({ password: pass.value }); if (up.error) throw up.error; closeModal(); toast('Нууц үг шинэчлэгдлээ.'); }
       } catch (x) { say(err(x), true); } finally { go.disabled = false; }
@@ -129,6 +139,49 @@
       } }, 'Хадгалах');
       box.appendChild(el('div', { class: 'hd' }, [avatar(p, 'lg'), el('div', null, [el('b', { style: 'font-size:20px' }, p.username), el('span', { class: 'msr-bdg' }, S.admin ? 'ADMIN' : 'USER')])]));
       box.appendChild(el('dl', null, [el('dt', null, 'Имэйл'), el('dd', null, S.user.email), el('dt', null, 'Бүртгүүлсэн'), el('dd', null, new Date(S.user.created_at).toLocaleDateString('mn-MN')), el('dt', null, 'Username'), el('dd', null, name), el('dt', null, 'Профайл зураг'), el('dd', null, file)]));
+      var claimBox = el('div', { style: 'margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:10px' }, el('b', null, 'Standoff 2 ID Verification'));
+      box.appendChild(claimBox);
+      (async function () {
+        var r = await sb.from('player_id_verifications').select('game_id,status').eq('user_id', S.user.id).maybeSingle();
+        if (!box.isConnected) return;
+        if (r.error) { claimBox.appendChild(el('p', { class: 'msr-note' }, 'ID мэдээллийг ачаалж чадсангүй.')); return; }
+        if (r.data) { claimBox.appendChild(el('p', null, 'ID: ' + r.data.game_id + ' · ' + (r.data.status === 'verified' ? '✓ Verified' : r.data.status === 'rejected' ? 'Rejected — админтай холбогдоно уу' : 'Pending — Discord-оор screenshot илгээнэ үү'))); return; }
+        var saved = ''; try { saved = localStorage.getItem('msr-pending-game-' + S.user.id) || ''; } catch (_) {}
+        var input = el('input', { type: 'text', inputmode: 'numeric', maxlength: 20, placeholder: 'Standoff 2 ID', value: saved, style: 'font-size:16px;max-width:100%;padding:10px' });
+        var add = el('button', { class: 'msr-btn pri', type: 'button', onclick: async function () {
+          var id = input.value.trim(); if (!/^[0-9]{4,20}$/.test(id)) return toast('4–20 оронтой ID оруулна уу.', true);
+          add.disabled = true;
+          var result = await sb.from('player_id_verifications').insert({ user_id: S.user.id, game_id: id, status: 'pending' });
+          add.disabled = false;
+          if (result.error) return toast(result.error.code === '23505' ? 'Энэ ID аль хэдийн бүртгэлтэй. Discord-оор админтай холбогдоно уу.' : err(result.error), true);
+          try { localStorage.removeItem('msr-pending-game-' + S.user.id); } catch (_) {}
+          claimBox.textContent = 'ID: ' + id + ' · Pending — Discord-оор screenshot илгээнэ үү';
+        } }, 'ID бүртгүүлэх');
+        claimBox.appendChild(el('p', { class: 'msr-note' }, 'SO2 ID-гаа бүртгүүлээд Discord-оор screenshot явуулна уу.')); claimBox.appendChild(input); claimBox.appendChild(add);
+      })();
+      if (S.admin) {
+        var adminBox = el('div', { style: 'margin:18px 0;padding:15px;border:1px solid var(--line);border-radius:10px' }, el('h3', null, 'Admin · ID Verification'));
+        var reload = el('button', { class: 'msr-btn', type: 'button' }, 'Хүсэлтүүдийг ачаалах');
+        var items = el('div');
+        reload.addEventListener('click', async function () {
+          items.textContent = ''; var res = await sb.from('player_id_verifications').select('user_id,game_id,status,created_at').order('created_at', { ascending: false }).limit(100);
+          if (res.error) return toast(err(res.error), true);
+          res.data.forEach(function (v) {
+            var edit = el('input', { type: 'text', value: v.game_id, maxlength: 20, inputmode: 'numeric', style: 'font-size:16px;width:130px;max-width:100%' });
+            var row = el('div', { style: 'padding:10px 0;border-bottom:1px solid var(--line)' }, [el('small', null, v.user_id.slice(0,8) + ' · ' + v.status), edit]);
+            [['verified','Verify'],['rejected','Reject'],['pending','Save ID']].forEach(function (a) {
+              row.appendChild(el('button', { class: 'msr-btn sm', type: 'button', onclick: async function () {
+                var id = edit.value.trim(); if (!/^[0-9]{4,20}$/.test(id)) return toast('ID буруу байна.', true);
+                var up = await sb.from('player_id_verifications').update({ game_id: id, status: a[0] }).eq('user_id', v.user_id);
+                if (up.error) return toast(up.error.code === '23505' ? 'ID давхардсан байна.' : err(up.error), true);
+                toast('Хадгаллаа'); reload.click();
+              } }, a[1]));
+            });
+            items.appendChild(row);
+          });
+        });
+        adminBox.appendChild(reload); adminBox.appendChild(items); box.appendChild(adminBox);
+      }
       box.appendChild(save); box.appendChild(msg);
     }
     document.addEventListener('msr:auth', draw); draw(); return box;
